@@ -8,6 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Tone.js for kid-friendly synthesised audio effects -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Pre-generated Kokoro Mandarin clips (scripts/generate_audio.py); browser speech is the fallback -->
+  <script src="audio/manifest.js"></script>
   <!-- Google Fonts: ZCOOL KuaiLe, Nunito, Noto Sans SC -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -852,16 +854,81 @@
       } catch (e) {}
     }
 
-    // Speech Synthesis wrapper
-    function speakText(text, rate = currentSpeechRate, onEndCallback = null) {
+    // Pre-generated clip lookup. Below this rate the slow (0.6x) recording is used,
+    // so ultra-slow speeds stretch the audio less and stay clear.
+    const SLOW_CLIP_THRESHOLD = 0.7;
+    let currentClip = null;
+
+    function findClip(text, rate) {
+      const lib = window.LESSON_AUDIO;
+      const id = lib && lib.clips[text.trim()];
+      if (!id) return null;
+      const suffix = rate < SLOW_CLIP_THRESHOLD ? 's' : 'n';
+      return { url: `${lib.dir}/${id}-${suffix}.mp3`, playbackRate: rate / lib.speeds[suffix] };
+    }
+
+    function stopCurrentClip() {
+      if (!currentClip) return;
+      currentClip.onended = null;
+      currentClip.onerror = null;
+      currentClip.pause();
+      currentClip = null;
+    }
+
+    // Speech wrapper: plays the Kokoro clip when one exists, otherwise browser speech.
+    // onStartCallback receives the clip duration in ms (null when unknown).
+    function speakText(text, rate = currentSpeechRate, onEndCallback = null, onStartCallback = null) {
+      stopCurrentClip();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
+
+      let hasFired = false;
+      const finishExecution = () => {
+        if (!hasFired) {
+          hasFired = true;
+          if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
+          if (onEndCallback) onEndCallback();
+        }
+      };
+
+      // Fallback safety timer to prevent a stalled engine or clip from blocking callbacks
+      const estimatedMs = Math.max(1200, (text.length * 700 / rate) + 900);
+      speechSafetyTimer = setTimeout(finishExecution, estimatedMs);
+
+      const clip = findClip(text, rate);
+      if (clip) {
+        playClip(text, rate, clip, finishExecution, onStartCallback);
+      } else {
+        speakWithBrowser(text, rate, finishExecution, onStartCallback);
+      }
+    }
+
+    function playClip(text, rate, clip, onEnd, onStart) {
+      const audio = new Audio(clip.url);
+      audio.preservesPitch = true;
+      audio.webkitPreservesPitch = true;
+      audio.playbackRate = clip.playbackRate;
+      currentClip = audio;
+
+      const fallBack = () => {
+        if (currentClip !== audio) return;
+        stopCurrentClip();
+        speakWithBrowser(text, rate, onEnd, onStart);
+      };
+      audio.onended = onEnd;
+      audio.onerror = fallBack;
+      audio.addEventListener('playing', () => {
+        if (onStart) onStart(audio.duration * 1000 / audio.playbackRate);
+      }, { once: true });
+      audio.play().catch(fallBack);
+    }
+
+    function speakWithBrowser(text, rate, onEnd, onStart) {
       if (!('speechSynthesis' in window)) {
         showToast('浏览器不支持语音播放 (Browser lacks Speech Synthesis)', 'error');
-        if (onEndCallback) onEndCallback();
+        onEnd();
         return;
       }
-
-      window.speechSynthesis.cancel();
-      if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
 
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = 'zh-CN';
@@ -875,28 +942,14 @@
         utterance.voice = preferred;
       }
 
-      let hasFired = false;
-      const finishExecution = () => {
-        if (!hasFired) {
-          hasFired = true;
-          if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
-          if (onEndCallback) onEndCallback();
-        }
-      };
-
-      utterance.onend = finishExecution;
-      utterance.onerror = finishExecution;
-
-      // Fallback safety timer to prevent speech engine stall on iOS/Chrome
-      const estimatedMs = Math.max(1200, (text.length * 700 / rate) + 900);
-      speechSafetyTimer = setTimeout(() => {
-        finishExecution();
-      }, estimatedMs);
-
+      utterance.onend = onEnd;
+      utterance.onerror = onEnd;
       window.speechSynthesis.speak(utterance);
+      if (onStart) onStart(null);
     }
 
     function stopSpeech() {
+      stopCurrentClip();
       if ('speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
@@ -988,27 +1041,30 @@
         if (!t.isPunct) meaningfulTokens.push(tIdx);
       });
 
-      // Calculate time step per character proportional to speech rate
-      const charDurationMs = (480 / currentSpeechRate);
-      let currentStep = 0;
+      // Spread the highlight over the real clip length; estimate from speech rate if unknown
+      const startKaraoke = (durationMs) => {
+        const charDurationMs = durationMs ? durationMs / meaningfulTokens.length : (480 / currentSpeechRate);
+        let currentStep = 0;
+        if (karaokeIntervalId) clearInterval(karaokeIntervalId);
 
-      karaokeIntervalId = setInterval(() => {
-        document.querySelectorAll('.char-reading-active').forEach(e => e.classList.remove('char-reading-active'));
-        if (currentStep < meaningfulTokens.length) {
-          const tIdx = meaningfulTokens[currentStep];
-          const span = document.querySelector(`#token-${lineIndex}-${tIdx} .char-span`);
-          if (span) span.classList.add('char-reading-active');
-          currentStep++;
-        } else {
-          clearInterval(karaokeIntervalId);
-        }
-      }, charDurationMs);
+        karaokeIntervalId = setInterval(() => {
+          document.querySelectorAll('.char-reading-active').forEach(e => e.classList.remove('char-reading-active'));
+          if (currentStep < meaningfulTokens.length) {
+            const tIdx = meaningfulTokens[currentStep];
+            const span = document.querySelector(`#token-${lineIndex}-${tIdx} .char-span`);
+            if (span) span.classList.add('char-reading-active');
+            currentStep++;
+          } else {
+            clearInterval(karaokeIntervalId);
+          }
+        }, charDurationMs);
+      };
 
       speakText(line.rawText, currentSpeechRate, () => {
         if (karaokeIntervalId) clearInterval(karaokeIntervalId);
         clearAllHighlights();
         if (onDone) onDone();
-      });
+      }, startKaraoke);
     }
 
     // Robust continuous dialogue reader through all 6 sentences

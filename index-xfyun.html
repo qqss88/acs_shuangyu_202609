@@ -1,0 +1,1829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>第三课 可爱的熊猫 - 快乐中文课堂学习乐园</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js for kid-friendly synthesised audio effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+  <!-- Pre-generated iFlytek Mandarin clips (scripts/tts_xfyun.py); browser speech is the fallback -->
+  <script src="audio/manifest.xfyun.js"></script>
+  <!-- Google Fonts: ZCOOL KuaiLe, Nunito, Noto Sans SC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Nunito:wght@400;600;700;800;900&family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bamboo: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              200: '#bbf7d0',
+              300: '#86efac',
+              400: '#4ade80',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            },
+            pandaDark: '#1e293b',
+            warmSun: '#fef08a',
+            peachSoft: '#ffe4e6'
+          },
+          fontFamily: {
+            kuaile: ['"ZCOOL KuaiLe"', 'cursive', 'sans-serif'],
+            sans: ['"Nunito"', '"Noto Sans SC"', 'sans-serif'],
+            chinese: ['"Noto Sans SC"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .card-perspective {
+      perspective: 1000px;
+    }
+    .card-inner {
+      transform-style: preserve-3d;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-flipped {
+      transform: rotateY(180deg);
+    }
+    .card-face {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .card-back {
+      transform: rotateY(180deg);
+    }
+    .char-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    .char-reading-active {
+      background-color: #fef08a !important;
+      color: #991b1b !important;
+      font-weight: 900 !important;
+      border-radius: 0.375rem;
+      transform: scale(1.15);
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.85);
+      transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .sentence-active-box {
+      border-color: #22c55e !important;
+      background-color: #f0fdf4 !important;
+      box-shadow: 0 10px 15px -3px rgba(34, 197, 94, 0.15);
+    }
+    .ruby-pinyin rt {
+      font-size: 0.82rem;
+      letter-spacing: -0.02em;
+      color: #374151;
+      font-weight: 700;
+      user-select: none;
+    }
+    @keyframes chewAnim {
+      0%, 100% { transform: scale(1) translateY(0); }
+      30% { transform: scale(1.1, 0.92) translateY(6px); }
+      60% { transform: scale(0.95, 1.08) translateY(-4px); }
+    }
+    .animate-chew {
+      animation: chewAnim 0.4s ease-in-out 3;
+    }
+    @keyframes shakeNo {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      20% { transform: translateX(-8px) rotate(-4deg); }
+      40% { transform: translateX(8px) rotate(4deg); }
+      60% { transform: translateX(-5px) rotate(-2deg); }
+      80% { transform: translateX(5px) rotate(2deg); }
+    }
+    .animate-shake-no {
+      animation: shakeNo 0.5s ease-in-out 1;
+    }
+    @keyframes popIn {
+      0% { transform: translateY(100%) scale(0.6); opacity: 0; }
+      70% { transform: translateY(-10%) scale(1.05); opacity: 1; }
+      100% { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    .animate-pop-in {
+      animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+    @keyframes bambooFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .bamboo-float {
+      animation: bambooFloat 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-[#f2f8f0] text-gray-800 font-sans min-h-screen flex flex-col selection:bg-bamboo-200">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white/95 backdrop-blur-md border-b-2 border-bamboo-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 flex flex-wrap items-center justify-between gap-2.5">
+      <!-- Brand & Title -->
+      <div class="flex items-center space-x-2.5 cursor-pointer" onclick="switchTab('reader')">
+        <div class="w-11 h-11 bg-bamboo-100 rounded-2xl flex items-center justify-center text-3xl shadow-inner border border-bamboo-300 transform hover:scale-105 transition">
+          🐼
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="text-xl md:text-2xl font-black text-bamboo-800 font-kuaile tracking-wide">第三课 可爱的熊猫</h1>
+            <span class="text-xs bg-bamboo-100 text-bamboo-800 px-2 py-0.5 rounded-full font-bold">Lesson 3</span>
+          </div>
+          <p class="text-xs text-gray-500 font-medium">Bilingual Chinese Classroom App · 双语点读与儿童乐园</p>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center bg-gray-100/90 p-1.5 rounded-2xl gap-1 border border-gray-200/90 overflow-x-auto max-w-full">
+        <button id="nav-reader" onclick="switchTab('reader')" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1 bg-white text-bamboo-800 shadow-xs whitespace-nowrap">
+          <span>📖</span> <span>课文朗读</span>
+        </button>
+        <button id="nav-flashcards" onclick="switchTab('flashcards')" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 hover:text-bamboo-700 transition flex items-center gap-1 whitespace-nowrap">
+          <span>🗂️</span> <span>字词卡片</span>
+        </button>
+        <button id="nav-feedpanda" onclick="switchTab('feedpanda')" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 hover:text-bamboo-700 transition flex items-center gap-1 whitespace-nowrap">
+          <span>🎋</span> <span class="text-emerald-700 font-black">喂小熊猫</span>
+        </button>
+        <button id="nav-monkey" onclick="switchTab('monkey')" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 hover:text-bamboo-700 transition flex items-center gap-1 whitespace-nowrap">
+          <span>🍌</span> <span class="text-amber-700 font-black">猴子摘香蕉</span>
+        </button>
+        <button id="nav-games" onclick="switchTab('games')" class="nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 hover:text-bamboo-700 transition flex items-center gap-1 whitespace-nowrap">
+          <span>🎮</span> <span>更多练习</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Notification Toast Container -->
+  <div id="toast-container" class="fixed top-20 right-4 z-50 pointer-events-none flex flex-col gap-2"></div>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-6xl w-full mx-auto px-3 sm:px-4 py-5">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: 课文朗读点读 (Dialogue Reader)       -->
+    <!-- ========================================== -->
+    <section id="tab-reader" class="tab-pane flex flex-col gap-5">
+      
+      <!-- Control Bar -->
+      <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-xs border border-bamboo-200 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+          <!-- Play Full Dialogue Button -->
+          <button id="btn-play-all" onclick="togglePlayFullDialogue()" class="bg-bamboo-600 hover:bg-bamboo-700 active:scale-95 text-white font-black px-5 py-2.5 rounded-2xl shadow-md transition flex items-center gap-2">
+            <span id="play-all-icon" class="text-lg">▶️</span>
+            <span id="play-all-text">全文朗读 (Play All)</span>
+          </button>
+          
+          <button onclick="stopSpeech()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-2xl transition">
+            ⏹️ 停止 (Stop)
+          </button>
+
+          <!-- Ultra-Slow to Normal Speed Bar -->
+          <div class="flex items-center space-x-1.5 bg-bamboo-50 px-3 py-1.5 rounded-2xl border border-bamboo-200">
+            <span class="text-xs font-bold text-bamboo-900 flex items-center gap-1">
+              <span>🐢</span> <span>语速:</span>
+            </span>
+            <button onclick="setSpeed(0.3)" id="speed-03" class="speed-btn px-2 py-1 text-xs font-black rounded-lg bg-white border border-gray-200 text-gray-700 hover:border-bamboo-400">0.3x</button>
+            <button onclick="setSpeed(0.5)" id="speed-05" class="speed-btn px-2 py-1 text-xs font-black rounded-lg bg-white border border-gray-200 text-gray-700 hover:border-bamboo-400">0.5x</button>
+            <button onclick="setSpeed(0.7)" id="speed-07" class="speed-btn px-2 py-1 text-xs font-bold rounded-lg bg-white border border-gray-200 text-gray-700 hover:border-bamboo-400">0.7x</button>
+            <button onclick="setSpeed(0.85)" id="speed-085" class="speed-btn px-2 py-1 text-xs font-black rounded-lg bg-bamboo-600 text-white shadow-xs">0.85x</button>
+            <button onclick="setSpeed(1.0)" id="speed-10" class="speed-btn px-2 py-1 text-xs font-bold rounded-lg bg-white border border-gray-200 text-gray-700 hover:border-bamboo-400">1.0x</button>
+          </div>
+        </div>
+
+        <!-- Toggles: Pinyin & English -->
+        <div class="flex items-center gap-3 text-xs sm:text-sm font-bold">
+          <label class="flex items-center gap-1.5 cursor-pointer select-none bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200 hover:bg-gray-100">
+            <input type="checkbox" id="toggle-pinyin" checked onchange="togglePinyinDisplay(this.checked)" class="w-4 h-4 accent-bamboo-600 rounded">
+            <span class="text-gray-700">拼音 Pinyin</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer select-none bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-200 hover:bg-gray-100">
+            <input type="checkbox" id="toggle-english" checked onchange="toggleEnglishDisplay(this.checked)" class="w-4 h-4 accent-bamboo-600 rounded">
+            <span class="text-gray-700">英文 Translation</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Quick Hint Banner -->
+      <div class="bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-2 text-xs md:text-sm text-emerald-900 flex items-center justify-between shadow-2xs">
+        <div class="flex items-center gap-2">
+          <span class="text-base">🎋</span>
+          <span><strong>点读指导 (Interactive Reading):</strong> 点击任意单字直接听标准普通话发音；点整句喇叭可卡拉OK逐字跟读；超慢速 0.3x/0.5x 便于听清声母与声调。</span>
+        </div>
+        <span class="hidden md:inline-block text-xs bg-white text-emerald-800 px-2.5 py-0.5 rounded-full font-bold border border-emerald-200">标准普通话</span>
+      </div>
+
+      <!-- Dialogue Bubbles Container -->
+      <div id="dialogue-container" class="space-y-4">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: 字词抽认卡 (Flashcards)              -->
+    <!-- ========================================== -->
+    <section id="tab-flashcards" class="tab-pane hidden flex flex-col items-center">
+      <div class="w-full max-w-xl flex flex-col items-center gap-4">
+        
+        <!-- Controls row -->
+        <div class="w-full flex items-center justify-between px-2 text-sm">
+          <div class="flex items-center gap-3">
+            <span class="font-bold text-gray-500" id="card-counter">1 / 13</span>
+            <button onclick="shuffleCards()" class="px-3 py-1.5 bg-white border border-gray-200 rounded-xl text-gray-700 hover:text-bamboo-700 text-xs font-bold shadow-2xs transition">
+              🔀 随机打乱 (Shuffle)
+            </button>
+          </div>
+          <label class="flex items-center gap-2 cursor-pointer select-none">
+            <input type="checkbox" id="flashcard-pinyin-toggle" checked onchange="updateCardUI()" class="w-4 h-4 accent-bamboo-600 rounded">
+            <span class="text-xs font-bold text-gray-700">显示拼音 (Show Pinyin)</span>
+          </label>
+        </div>
+
+        <!-- Flip Card Component -->
+        <div class="w-full h-84 sm:h-96 card-perspective cursor-pointer" onclick="flipCurrentCard()">
+          <div id="flashcard-element" class="card-inner relative w-full h-full">
+            
+            <!-- Front of Card -->
+            <div class="card-face absolute inset-0 bg-white rounded-3xl p-7 border-2 border-bamboo-200 shadow-md flex flex-col items-center justify-between select-none">
+              <div class="w-full flex justify-between items-center text-gray-400 text-xs font-bold">
+                <span class="bg-bamboo-50 text-bamboo-800 px-3 py-1 rounded-full border border-bamboo-200 font-bold">生词卡片 Vocabulary Card</span>
+                <span class="text-bamboo-700 flex items-center gap-1 font-bold">🔄 点击卡片翻面</span>
+              </div>
+
+              <!-- Main Character Display -->
+              <div class="text-center my-auto flex flex-col items-center">
+                <div id="card-front-pinyin" class="text-2xl font-black text-bamboo-700 mb-2 tracking-wider">xióng māo</div>
+                <div id="card-front-hanzi" class="text-7xl sm:text-8xl font-black text-pandaDark font-chinese tracking-tight py-2">熊猫</div>
+              </div>
+
+              <!-- Pronounce button on front -->
+              <div class="w-full flex justify-center">
+                <button onclick="event.stopPropagation(); speakText(vocabList[currentCardIndex].hanzi, currentSpeechRate);" class="bg-bamboo-100 hover:bg-bamboo-200 text-bamboo-900 font-black px-6 py-2.5 rounded-full flex items-center gap-2 text-sm shadow-xs transition">
+                  🔊 听发音 (Listen)
+                </button>
+              </div>
+            </div>
+
+            <!-- Back of Card -->
+            <div class="card-face card-back absolute inset-0 bg-gradient-to-br from-bamboo-50 via-white to-amber-50 rounded-3xl p-7 border-2 border-bamboo-300 shadow-lg flex flex-col items-center justify-between select-none">
+              <div class="w-full flex justify-between items-center text-xs font-bold">
+                <span class="text-bamboo-800 font-bold">📖 释义与例句 (Meaning & Sentence)</span>
+                <span class="text-gray-400">🔄 点击返回正面</span>
+              </div>
+
+              <div class="text-center my-auto w-full px-2">
+                <div id="card-back-hanzi" class="text-4xl font-black text-gray-900 font-chinese mb-1">熊猫</div>
+                <div id="card-back-pinyin" class="text-xl font-bold text-bamboo-700 mb-2">xióng māo</div>
+                <div id="card-back-meaning" class="text-2xl font-black text-gray-700 mb-4 bg-white/90 py-2 px-4 rounded-xl border border-bamboo-100 shadow-2xs">panda</div>
+                
+                <div class="bg-white/95 p-3.5 rounded-2xl border border-gray-200 shadow-2xs text-left">
+                  <div class="text-xs text-gray-400 font-semibold mb-1">课文原句 (Text Sentence):</div>
+                  <div id="card-back-example" class="text-base font-bold text-gray-800">熊猫很可爱。</div>
+                  <div id="card-back-example-en" class="text-xs text-gray-500 mt-0.5">Pandas are very cute.</div>
+                </div>
+              </div>
+
+              <div class="w-full flex justify-center">
+                <button onclick="event.stopPropagation(); speakText(vocabList[currentCardIndex].example, currentSpeechRate);" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-black px-5 py-2 rounded-full flex items-center gap-1.5 text-xs transition">
+                  🔊 读原句 (Read Sentence)
+                </button>
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Flashcard Navigation Buttons -->
+        <div class="flex items-center gap-3 mt-2">
+          <button onclick="prevCard()" class="bg-white hover:bg-gray-50 border border-gray-200 font-black text-gray-700 px-5 py-2.5 rounded-2xl shadow-xs active:scale-95 transition">
+            ◀ 上一个
+          </button>
+          <button onclick="flipCurrentCard()" class="bg-bamboo-100 hover:bg-bamboo-200 text-bamboo-900 font-black px-5 py-2.5 rounded-2xl active:scale-95 transition">
+            🔄 翻面
+          </button>
+          <button onclick="nextCard()" class="bg-bamboo-600 hover:bg-bamboo-700 text-white font-black px-6 py-2.5 rounded-2xl shadow-md active:scale-95 transition">
+            下一个 ▶
+          </button>
+        </div>
+
+        <!-- Vocab Badges -->
+        <div class="w-full mt-2 bg-white p-4 rounded-3xl border border-gray-200 shadow-2xs">
+          <div class="text-xs font-bold text-gray-500 mb-2">快速选词 (Quick Select):</div>
+          <div id="vocab-badges" class="flex flex-wrap gap-2"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: 游戏一：喂小熊猫吃竹子 (Feed Panda)  -->
+    <!-- ========================================== -->
+    <section id="tab-feedpanda" class="tab-pane hidden flex flex-col items-center">
+      <div class="max-w-2xl w-full bg-white rounded-3xl border-3 border-bamboo-300 shadow-lg p-5 sm:p-7 relative overflow-hidden">
+        
+        <!-- Game Header -->
+        <div class="flex items-center justify-between border-b-2 border-bamboo-100 pb-4 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="text-3xl">🎋</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-black text-bamboo-800 font-kuaile">喂小熊猫吃竹子 · Feed the Panda</h2>
+              <p class="text-xs text-gray-500">小熊猫肚子饿了，快听要求给它吃正确的竹子吧！</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <span class="text-xs text-gray-400 font-bold">饱食度 (Score)</span>
+              <span id="panda-score" class="text-2xl font-black text-emerald-600">0</span>
+            </div>
+            <div class="text-right pl-3 border-l border-gray-200">
+              <span class="text-xs text-gray-400 font-bold">连击 (Streak)</span>
+              <span id="panda-streak" class="text-2xl font-black text-amber-500">⭐ 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Audio prompt and target instruction -->
+        <div class="bg-gradient-to-r from-bamboo-50 via-emerald-50 to-amber-50 rounded-2xl p-4 border border-bamboo-200 flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <button onclick="replayPandaPromptAudio()" class="w-14 h-14 rounded-2xl bg-bamboo-600 hover:bg-bamboo-700 active:scale-95 text-white flex items-center justify-center text-2xl shadow-md transition">
+              🔊
+            </button>
+            <div>
+              <div class="text-xs font-bold text-gray-500">小熊猫想吃 (The panda wants):</div>
+              <div class="flex items-baseline gap-2">
+                <span id="panda-target-pinyin" class="text-lg font-black text-bamboo-800">xióng māo</span>
+                <span id="panda-target-en" class="text-xs font-bold text-gray-500">(panda)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-right">
+            <button onclick="startFeedPandaRound()" class="text-xs bg-white text-bamboo-700 font-bold px-3 py-1.5 rounded-xl border border-bamboo-200 hover:bg-bamboo-100 transition">
+              换一题 (Next)
+            </button>
+          </div>
+        </div>
+
+        <!-- Bamboo Choices Shelf -->
+        <div class="mb-6">
+          <div class="text-xs font-bold text-gray-500 mb-2.5 flex items-center justify-between">
+            <span>请选出鲜嫩竹子 (Click correct bamboo):</span>
+            <span class="text-xs text-bamboo-600 font-bold">点错了小熊猫会摇头哦！</span>
+          </div>
+          <div id="bamboo-choices-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <!-- Bamboo cards rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Animated Panda Stage -->
+        <div class="bg-[#e9f7ea] rounded-3xl p-6 border-2 border-dashed border-bamboo-300 flex flex-col items-center justify-center relative min-h-[210px]">
+          <!-- Speech bubble from Panda -->
+          <div id="panda-speech-bubble" class="absolute top-2 bg-white px-4 py-1.5 rounded-full border border-bamboo-300 shadow-xs text-xs sm:text-sm font-black text-bamboo-800 transition-all duration-300">
+            😋 我好饿呀，我想吃竹子！(I'm hungry!)
+          </div>
+
+          <!-- Panda Mascot Avatar with animation classes -->
+          <div id="panda-mascot" class="text-7xl sm:text-8xl mt-5 select-none transition-transform duration-300 cursor-pointer" onclick="replayPandaPromptAudio()">
+            🐼
+          </div>
+
+          <!-- Bowl / Harvest display -->
+          <div class="mt-2 flex items-center gap-1.5 bg-white/80 px-3 py-1 rounded-full text-xs font-bold text-gray-600 border border-bamboo-200">
+            <span>已收集竹子:</span>
+            <span id="panda-harvest-count" class="text-bamboo-700 font-black">🎋 0 根</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: 游戏二：猴子摘香蕉 (Monkey Game)     -->
+    <!-- ========================================== -->
+    <section id="tab-monkey" class="tab-pane hidden flex flex-col items-center">
+      <div class="max-w-2xl w-full bg-white rounded-3xl border-3 border-amber-300 shadow-lg p-5 sm:p-7 relative overflow-hidden">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b-2 border-amber-100 pb-4 mb-4">
+          <div class="flex items-center gap-2.5">
+            <span class="text-3xl">🐵</span>
+            <div>
+              <h2 class="text-xl sm:text-2xl font-black text-amber-900 font-kuaile">猴子摘香蕉 · 反义词与字词挑战</h2>
+              <p class="text-xs text-gray-500">课文对比挑战（胖/瘦、快/慢、黑/白、走/跑），帮猴子拿香蕉！</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <span class="text-xs text-gray-400 font-bold">香蕉篮 (Bananas)</span>
+              <span id="monkey-banana-count" class="text-2xl font-black text-amber-500">🍌 0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Prompt Banner -->
+        <div class="bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 rounded-2xl p-4 border border-amber-200 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="bg-amber-200 text-amber-900 text-xs px-2.5 py-0.5 rounded-full font-black" id="monkey-round-badge">反义词关卡</span>
+              <span class="text-xs text-gray-500 font-bold">仔细读题：</span>
+            </div>
+            <div id="monkey-question-title" class="text-lg sm:text-xl font-black text-gray-900 mt-1 font-chinese">
+              “胖” (fat) 的反义词是哪个？
+            </div>
+            <div id="monkey-question-en" class="text-xs text-gray-500 mt-0.5 font-bold">
+              What is the opposite of '胖' (fat)?
+            </div>
+          </div>
+          <button onclick="speakMonkeyQuestion()" class="bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-black px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition self-start sm:self-center">
+            🔊 读题目
+          </button>
+        </div>
+
+        <!-- 4 Holes / Monkeys with characters -->
+        <div class="grid grid-cols-2 gap-4 my-2">
+          <div id="monkey-hole-0" onclick="handleMonkeyChoice(0)" class="monkey-burrow bg-gradient-to-b from-stone-100 to-stone-200 border-2 border-stone-300 rounded-3xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 active:scale-95 transition min-h-[140px] shadow-inner group">
+            <span class="text-4xl group-hover:scale-110 transition duration-200">🐒</span>
+            <span id="monkey-text-0" class="text-3xl font-black text-gray-900 font-chinese mt-2">瘦</span>
+            <span id="monkey-py-0" class="text-xs font-bold text-gray-500">shòu</span>
+          </div>
+
+          <div id="monkey-hole-1" onclick="handleMonkeyChoice(1)" class="monkey-burrow bg-gradient-to-b from-stone-100 to-stone-200 border-2 border-stone-300 rounded-3xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 active:scale-95 transition min-h-[140px] shadow-inner group">
+            <span class="text-4xl group-hover:scale-110 transition duration-200">🐒</span>
+            <span id="monkey-text-1" class="text-3xl font-black text-gray-900 font-chinese mt-2">快</span>
+            <span id="monkey-py-1" class="text-xs font-bold text-gray-500">kuài</span>
+          </div>
+
+          <div id="monkey-hole-2" onclick="handleMonkeyChoice(2)" class="monkey-burrow bg-gradient-to-b from-stone-100 to-stone-200 border-2 border-stone-300 rounded-3xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 active:scale-95 transition min-h-[140px] shadow-inner group">
+            <span class="text-4xl group-hover:scale-110 transition duration-200">🐒</span>
+            <span id="monkey-text-2" class="text-3xl font-black text-gray-900 font-chinese mt-2">慢</span>
+            <span id="monkey-py-2" class="text-xs font-bold text-gray-500">màn</span>
+          </div>
+
+          <div id="monkey-hole-3" onclick="handleMonkeyChoice(3)" class="monkey-burrow bg-gradient-to-b from-stone-100 to-stone-200 border-2 border-stone-300 rounded-3xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 active:scale-95 transition min-h-[140px] shadow-inner group">
+            <span class="text-4xl group-hover:scale-110 transition duration-200">🐒</span>
+            <span id="monkey-text-3" class="text-3xl font-black text-gray-900 font-chinese mt-2">黑</span>
+            <span id="monkey-py-3" class="text-xs font-bold text-gray-500">hēi</span>
+          </div>
+        </div>
+
+        <!-- Monkey game feedback banner -->
+        <div id="monkey-feedback" class="mt-4 text-center font-black text-base min-h-[2rem]"></div>
+
+        <!-- Banana harvest progress bar -->
+        <div class="mt-2 bg-amber-50 p-3 rounded-2xl border border-amber-200 flex items-center justify-between text-xs font-bold text-amber-900">
+          <span>猴子开心度:</span>
+          <div class="flex-grow mx-3 bg-amber-200 rounded-full h-3 overflow-hidden">
+            <div id="monkey-progress-fill" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 10%;"></div>
+          </div>
+          <span id="monkey-progress-text">1 / 8 关</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: 综合小游戏套件 (Games Suite)         -->
+    <!-- ========================================== -->
+    <section id="tab-games" class="tab-pane hidden flex flex-col gap-6">
+      <!-- Sub-games Selector -->
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <button id="subgame-btn-listen" onclick="switchSubGame('listen')" class="game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-bamboo-600 text-white shadow-md transition">
+          🎧 游戏三：听音辨字 (Listening Quiz)
+        </button>
+        <button id="subgame-btn-match" onclick="switchSubGame('match')" class="game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-white text-gray-700 border border-gray-200 hover:border-bamboo-400 shadow-2xs transition">
+          🧩 游戏四：字义对对碰 (Memory Match)
+        </button>
+        <button id="subgame-btn-sentence" onclick="switchSubGame('sentence')" class="game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-white text-gray-700 border border-gray-200 hover:border-bamboo-400 shadow-2xs transition">
+          🚂 游戏五：连词成句 (Sentence Builder)
+        </button>
+      </div>
+
+      <!-- Sub Game: 听音辨字 -->
+      <div id="game-panel-listen" class="subgame-panel max-w-2xl mx-auto w-full bg-white rounded-3xl p-6 md:p-8 border-2 border-bamboo-200 shadow-md">
+        <div class="flex items-center justify-between border-b pb-4 mb-6">
+          <div>
+            <h3 class="text-lg md:text-xl font-black text-gray-800 font-kuaile">听音辨字 · 谁最聪明？</h3>
+            <p class="text-xs text-gray-500">仔细听标准发音，选出正确的汉字卡片！</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <span class="text-xs text-gray-400 font-bold block">得分 (Score)</span>
+              <span id="quiz-score" class="text-2xl font-black text-bamboo-600">0</span>
+            </div>
+            <div class="text-right pl-3 border-l">
+              <span class="text-xs text-gray-400 font-bold block">连对 (Streak)</span>
+              <span id="quiz-streak" class="text-2xl font-black text-amber-500">🔥 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center text-center my-4">
+          <button onclick="playQuizPromptAudio()" class="w-24 h-24 rounded-full bg-gradient-to-tr from-bamboo-500 to-bamboo-400 hover:scale-105 active:scale-95 text-white flex flex-col items-center justify-center shadow-lg transition duration-200 group">
+            <span class="text-4xl group-hover:scale-110 transition">🔊</span>
+            <span class="text-xs font-bold mt-1">点我听音</span>
+          </button>
+          <span class="text-xs text-gray-400 font-bold mt-3">Click speaker to hear the word again</span>
+        </div>
+
+        <div id="quiz-options-grid" class="grid grid-cols-2 gap-4 mt-8"></div>
+        <div id="quiz-feedback" class="mt-6 text-center font-bold text-base min-h-[1.5rem]"></div>
+      </div>
+
+      <!-- Sub Game: 翻牌连连看 -->
+      <div id="game-panel-match" class="subgame-panel hidden max-w-3xl mx-auto w-full bg-white rounded-3xl p-6 md:p-8 border-2 border-bamboo-200 shadow-md">
+        <div class="flex items-center justify-between border-b pb-4 mb-6">
+          <div>
+            <h3 class="text-lg md:text-xl font-black text-gray-800 font-kuaile">字义对对碰 · 记忆挑战</h3>
+            <p class="text-xs text-gray-500">找出汉字与其对应的英语或拼音进行配对！</p>
+          </div>
+          <div class="flex items-center gap-4">
+            <button onclick="startMatchGame()" class="px-4 py-2 bg-bamboo-100 hover:bg-bamboo-200 text-bamboo-800 font-bold rounded-xl text-xs transition">
+              🔄 重新洗牌
+            </button>
+            <div class="text-right">
+              <span class="text-xs text-gray-400 font-bold block">配对用时</span>
+              <span id="match-timer" class="text-xl font-black text-gray-700">0s</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="match-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3"></div>
+
+        <div id="match-win-banner" class="hidden mt-6 text-center bg-bamboo-100 border border-bamboo-300 p-4 rounded-2xl">
+          <div class="text-3xl mb-1">🎉 太棒了！全部配对成功！</div>
+          <p class="text-sm text-bamboo-800 font-bold">You matched all the vocabulary pairs!</p>
+          <button onclick="startMatchGame()" class="mt-3 bg-bamboo-600 text-white font-black px-6 py-2 rounded-xl hover:bg-bamboo-700 transition">
+            再玩一次 (Play Again)
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub Game: 连词成句 -->
+      <div id="game-panel-sentence" class="subgame-panel hidden max-w-2xl mx-auto w-full bg-white rounded-3xl p-6 md:p-8 border-2 border-bamboo-200 shadow-md">
+        <div class="flex items-center justify-between border-b pb-4 mb-4">
+          <div>
+            <h3 class="text-lg md:text-xl font-black text-gray-800 font-kuaile">连词成句 · 小小作家</h3>
+            <p class="text-xs text-gray-500">点击下方打乱的字块，按照正确语序组成句子！</p>
+          </div>
+          <span id="sentence-progress" class="text-xs font-bold bg-amber-100 text-amber-800 px-3 py-1 rounded-full">第 1 / 4 题</span>
+        </div>
+
+        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-200 mb-6">
+          <div class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">目标英文句子 (Target Meaning):</div>
+          <div id="target-sentence-en" class="text-base font-black text-bamboo-800">Where are you going this Sunday?</div>
+        </div>
+
+        <div class="mb-6">
+          <div class="text-xs text-gray-500 font-bold mb-2 flex items-center justify-between">
+            <span>你的组句 (Your Sentence):</span>
+            <button onclick="resetCurrentSentence()" class="text-xs text-rose-500 hover:underline">清空重选 (Reset)</button>
+          </div>
+          <div id="sentence-answer-zone" class="min-h-[70px] bg-bamboo-50/70 border-2 border-dashed border-bamboo-300 rounded-2xl p-3 flex flex-wrap items-center gap-2">
+            <span class="text-gray-400 text-sm select-none" id="empty-placeholder">点击下方词块放入此处...</span>
+          </div>
+        </div>
+
+        <div class="mb-6">
+          <div class="text-xs text-gray-500 font-bold mb-2">可选用词块 (Tap to pick):</div>
+          <div id="sentence-pool-zone" class="flex flex-wrap gap-2.5 min-h-[60px] p-2 bg-gray-50 rounded-2xl border border-gray-200"></div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="speakAnswerSentence()" id="btn-sentence-listen" class="hidden bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2 rounded-xl text-xs flex items-center gap-1.5 transition">
+            🔊 朗读成句
+          </button>
+          <div id="sentence-feedback" class="font-bold text-sm"></div>
+          <button id="btn-check-sentence" onclick="checkSentence()" class="bg-bamboo-600 hover:bg-bamboo-700 text-white font-black px-6 py-2.5 rounded-xl shadow-md transition ml-auto">
+            检查答案 (Check) ✓
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Interactive Character Tooltip Modal for Single Character Tap -->
+  <div id="char-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 hidden flex items-center justify-center p-4" onclick="closeCharModal()">
+    <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border-2 border-bamboo-300 text-center transform transition-all scale-100" onclick="event.stopPropagation()">
+      <div class="w-12 h-12 bg-bamboo-100 text-bamboo-700 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-black">
+        字
+      </div>
+      <div id="modal-pinyin" class="text-2xl font-bold text-bamboo-700 mb-1">xióng</div>
+      <div id="modal-hanzi" class="text-6xl font-black text-gray-900 font-chinese mb-3">熊</div>
+      <div id="modal-meaning" class="text-lg font-bold text-gray-700 bg-gray-50 py-2 px-4 rounded-xl border border-gray-100 mb-5">bear</div>
+      
+      <div class="flex gap-2 justify-center">
+        <button id="modal-speak-btn" onclick="speakCurrentModalChar()" class="bg-bamboo-600 hover:bg-bamboo-700 text-white font-bold px-6 py-2.5 rounded-2xl flex items-center gap-2 shadow-xs transition">
+          🔊 再次发音
+        </button>
+        <button onclick="closeCharModal()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold px-4 py-2.5 rounded-2xl transition">
+          关闭
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Classroom Footer -->
+  <footer class="mt-auto bg-white border-t border-gray-200/80 py-4 text-center text-xs text-gray-500">
+    <p>© 快乐双语中文学校 · 课件配套互动练习 · 《第三课 可爱的熊猫》</p>
+    <p class="mt-1 text-gray-400">Standard Mandarin Audio · 包含超慢速(0.3x/0.5x)精读与趣味互动游戏</p>
+  </footer>
+
+  <script>
+    // Full lesson dialogues with token-level karaoke metadata
+    const dialogueData = [
+      {
+        id: 1,
+        speaker: '阳阳 (Yangyang)',
+        avatar: '👦',
+        avatarBg: 'bg-blue-100 text-blue-700 border-blue-200',
+        english: 'Where are you going this Sunday?',
+        tokens: [
+          { char: '星', py: 'xīng', en: 'star/week' },
+          { char: '期', py: 'qī', en: 'period/cycle' },
+          { char: '天', py: 'tiān', en: 'day/Sunday' },
+          { char: '你', py: 'nǐ', en: 'you' },
+          { char: '想', py: 'xiǎng', en: 'want to / would like' },
+          { char: '去', py: 'qù', en: 'go to' },
+          { char: '哪', py: 'nǎ', en: 'where' },
+          { char: '儿', py: 'er', en: 'er (retroflex suffix)' },
+          { char: '？', py: '', en: 'question mark', isPunct: true }
+        ],
+        rawText: '星期天你想去哪儿？'
+      },
+      {
+        id: 2,
+        speaker: '小茜 (Xiaoxi)',
+        avatar: '👧',
+        avatarBg: 'bg-rose-100 text-rose-700 border-rose-200',
+        english: 'My Dad and I want to go to the zoo.',
+        tokens: [
+          { char: '我', py: 'wǒ', en: 'I / me' },
+          { char: '和', py: 'hé', en: 'and' },
+          { char: '爸', py: 'bà', en: 'dad' },
+          { char: '爸', py: 'ba', en: 'dad' },
+          { char: '想', py: 'xiǎng', en: 'want to' },
+          { char: '去', py: 'qù', en: 'go to' },
+          { char: '动', py: 'dòng', en: 'animal / move' },
+          { char: '物', py: 'wù', en: 'thing' },
+          { char: '园', py: 'yuán', en: 'park / garden' },
+          { char: '。', py: '', en: 'period', isPunct: true }
+        ],
+        rawText: '我和爸爸想去动物园。'
+      },
+      {
+        id: 3,
+        speaker: '阳阳 (Yangyang)',
+        avatar: '👦',
+        avatarBg: 'bg-blue-100 text-blue-700 border-blue-200',
+        english: 'I want to go and see pandas again too.',
+        tokens: [
+          { char: '我', py: 'wǒ', en: 'I' },
+          { char: '也', py: 'yě', en: 'also' },
+          { char: '想', py: 'xiǎng', en: 'want' },
+          { char: '再', py: 'zài', en: 'again' },
+          { char: '去', py: 'qù', en: 'go' },
+          { char: '看', py: 'kàn', en: 'see / look' },
+          { char: '看', py: 'kan', en: 'have a look' },
+          { char: '熊', py: 'xióng', en: 'bear' },
+          { char: '猫', py: 'māo', en: 'cat / panda' },
+          { char: '。', py: '', en: 'period', isPunct: true }
+        ],
+        rawText: '我也想再去看看熊猫。'
+      },
+      {
+        id: 4,
+        speaker: '小茜 (Xiaoxi)',
+        avatar: '👧',
+        avatarBg: 'bg-rose-100 text-rose-700 border-rose-200',
+        english: 'Pandas are very cute. I like their colors. They have white and black bodies, very beautiful.',
+        tokens: [
+          { char: '熊', py: 'xióng', en: 'bear' },
+          { char: '猫', py: 'māo', en: 'cat' },
+          { char: '很', py: 'hěn', en: 'very' },
+          { char: '可', py: 'kě', en: 'cute / can' },
+          { char: '爱', py: 'ài', en: 'love' },
+          { char: '，', py: '', en: 'comma', isPunct: true },
+          { char: '我', py: 'wǒ', en: 'I' },
+          { char: '喜', py: 'xǐ', en: 'like' },
+          { char: '欢', py: 'huan', en: 'joy' },
+          { char: '它', py: 'tā', en: 'its' },
+          { char: '的', py: 'de', en: 'possessive particle' },
+          { char: '颜', py: 'yán', en: 'color' },
+          { char: '色', py: 'sè', en: 'color' },
+          { char: '。', py: '', en: 'period', isPunct: true },
+          { char: '白', py: 'bái', en: 'white' },
+          { char: '色', py: 'sè', en: 'color' },
+          { char: '和', py: 'hé', en: 'and' },
+          { char: '黑', py: 'hēi', en: 'black' },
+          { char: '色', py: 'sè', en: 'color' },
+          { char: '的', py: 'de', en: 'particle' },
+          { char: '身', py: 'shēn', en: 'body' },
+          { char: '体', py: 'tǐ', en: 'body' },
+          { char: '，', py: '', en: 'comma', isPunct: true },
+          { char: '很', py: 'hěn', en: 'very' },
+          { char: '漂', py: 'piào', en: 'pretty' },
+          { char: '亮', py: 'liang', en: 'bright' },
+          { char: '。', py: '', en: 'period', isPunct: true }
+        ],
+        rawText: '熊猫很可爱，我喜欢它的颜色。白色和黑色的身体，很漂亮。'
+      },
+      {
+        id: 5,
+        speaker: '阳阳 (Yangyang)',
+        avatar: '👦',
+        avatarBg: 'bg-blue-100 text-blue-700 border-blue-200',
+        english: 'Pandas are very fat, and they move slow.',
+        tokens: [
+          { char: '熊', py: 'xióng', en: 'bear' },
+          { char: '猫', py: 'māo', en: 'cat' },
+          { char: '太', py: 'tài', en: 'too / very' },
+          { char: '胖', py: 'pàng', en: 'fat / chubby' },
+          { char: '了', py: 'le', en: 'aspect marker' },
+          { char: '，', py: '', en: 'comma', isPunct: true },
+          { char: '走', py: 'zǒu', en: 'walk / move' },
+          { char: '得', py: 'de', en: 'degree particle' },
+          { char: '慢', py: 'màn', en: 'slow' },
+          { char: '。', py: '', en: 'period', isPunct: true }
+        ],
+        rawText: '熊猫太胖了，走得慢。'
+      },
+      {
+        id: 6,
+        speaker: '小茜 (Xiaoxi)',
+        avatar: '👧',
+        avatarBg: 'bg-rose-100 text-rose-700 border-rose-200',
+        english: 'Monkeys are thin, so they move fast. I offered bananas to a monkey, and it quickly ran to my side.',
+        tokens: [
+          { char: '猴', py: 'hóu', en: 'monkey' },
+          { char: '子', py: 'zi', en: 'noun suffix' },
+          { char: '瘦', py: 'shòu', en: 'thin / slim' },
+          { char: '，', py: '', en: 'comma', isPunct: true },
+          { char: '跑', py: 'pǎo', en: 'run' },
+          { char: '得', py: 'de', en: 'degree particle' },
+          { char: '快', py: 'kuài', en: 'fast' },
+          { char: '。', py: '', en: 'period', isPunct: true },
+          { char: '我', py: 'wǒ', en: 'I' },
+          { char: '给', py: 'gěi', en: 'give / offer' },
+          { char: '一', py: 'yì', en: 'one' },
+          { char: '只', py: 'zhī', en: 'measure word' },
+          { char: '猴', py: 'hóu', en: 'monkey' },
+          { char: '子', py: 'zi', en: 'noun suffix' },
+          { char: '吃', py: 'chī', en: 'eat' },
+          { char: '香', py: 'xiāng', en: 'fragrant' },
+          { char: '蕉', py: 'jiāo', en: 'banana' },
+          { char: '，', py: '', en: 'comma', isPunct: true },
+          { char: '它', py: 'tā', en: 'it' },
+          { char: '很', py: 'hěn', en: 'very' },
+          { char: '快', py: 'kuài', en: 'quickly' },
+          { char: '跑', py: 'pǎo', en: 'ran' },
+          { char: '到', py: 'dào', en: 'to / arrive' },
+          { char: '我', py: 'wǒ', en: 'my' },
+          { char: '的', py: 'de', en: 'possessive' },
+          { char: '旁', py: 'páng', en: 'beside' },
+          { char: '边', py: 'biān', en: 'side' },
+          { char: '来', py: 'lái', en: 'come' },
+          { char: '。', py: '', en: 'period', isPunct: true }
+        ],
+        rawText: '猴子瘦，跑得快。我给一只猴子吃香蕉，它很快跑到我的旁边来。'
+      }
+    ];
+
+    // Core Vocabulary List
+    let vocabList = [
+      { hanzi: '熊猫', pinyin: 'xióng māo', en: 'panda', example: '熊猫很可爱。', exampleEn: 'Pandas are very cute.' },
+      { hanzi: '动物园', pinyin: 'dòng wù yuán', en: 'zoo', example: '我想去动物园。', exampleEn: 'I want to go to the zoo.' },
+      { hanzi: '可爱', pinyin: 'kě ài', en: 'cute / lovely', example: '小猫很可爱。', exampleEn: 'The kitten is very cute.' },
+      { hanzi: '颜色', pinyin: 'yán sè', en: 'color', example: '我喜欢它的颜色。', exampleEn: 'I like its color.' },
+      { hanzi: '漂亮', pinyin: 'piào liang', en: 'beautiful / pretty', example: '它的身体很漂亮。', exampleEn: 'Its body is very beautiful.' },
+      { hanzi: '胖', pinyin: 'pàng', en: 'fat / chubby', example: '熊猫太胖了。', exampleEn: 'The panda is so chubby.' },
+      { hanzi: '瘦', pinyin: 'shòu', en: 'thin / slim', example: '猴子很瘦。', exampleEn: 'The monkey is thin.' },
+      { hanzi: '慢', pinyin: 'màn', en: 'slow', example: '它走得很慢。', exampleEn: 'It walks slowly.' },
+      { hanzi: '快', pinyin: 'kuài', en: 'fast / quick', example: '猴子跑得快。', exampleEn: 'The monkey runs fast.' },
+      { hanzi: '猴子', pinyin: 'hóu zi', en: 'monkey', example: '猴子喜欢吃香蕉。', exampleEn: 'Monkeys like eating bananas.' },
+      { hanzi: '香蕉', pinyin: 'xiāng jiāo', en: 'banana', example: '我给猴子吃香蕉。', exampleEn: 'I fed the monkey a banana.' },
+      { hanzi: '旁边', pinyin: 'páng biān', en: 'beside / side', example: '它跑到我的旁边。', exampleEn: 'It ran to my side.' },
+      { hanzi: '星期天', pinyin: 'xīng qī tiān', en: 'Sunday', example: '星期天你想去哪儿？', exampleEn: 'Where do you want to go on Sunday?' }
+    ];
+
+    // Speech and audio settings
+    let currentSpeechRate = 0.85;
+    let isFullPlaying = false;
+    let fullPlayIndex = 0;
+    let currentModalChar = null;
+    let speechSafetyTimer = null;
+    let karaokeIntervalId = null;
+
+    // Tone.js Synth instance
+    let synth = null;
+    function getToneSynth() {
+      if (!synth && window.Tone) {
+        synth = new Tone.PolySynth(Tone.Synth).toDestination();
+        synth.volume.value = -8;
+      }
+      return synth;
+    }
+
+    function playSound(type) {
+      try {
+        const s = getToneSynth();
+        if (!s) return;
+        if (Tone.context.state !== 'running') {
+          Tone.start();
+        }
+        if (type === 'correct') {
+          s.triggerAttackRelease(['E5', 'G5', 'C6'], '16n');
+        } else if (type === 'wrong') {
+          s.triggerAttackRelease(['D3', 'C#3'], '12n');
+        } else if (type === 'click') {
+          s.triggerAttackRelease(['A4'], '32n');
+        } else if (type === 'win') {
+          s.triggerAttackRelease(['C5', 'E5', 'G5', 'C6'], '8n');
+        } else if (type === 'yummy') {
+          s.triggerAttackRelease(['C5', 'G5', 'E6'], '16n');
+        }
+      } catch (e) {}
+    }
+
+    // Pre-generated clip lookup. Below this rate the slow (0.6x) recording is used,
+    // so ultra-slow speeds stretch the audio less and stay clear.
+    const SLOW_CLIP_THRESHOLD = 0.7;
+    let currentClip = null;
+
+    function findClip(text, rate) {
+      const lib = window.LESSON_AUDIO;
+      const id = lib && lib.clips[text.trim()];
+      if (!id) return null;
+      const suffix = rate < SLOW_CLIP_THRESHOLD ? 's' : 'n';
+      return { url: `${lib.dir}/${id}-${suffix}.mp3`, playbackRate: rate / lib.speeds[suffix] };
+    }
+
+    function stopCurrentClip() {
+      if (!currentClip) return;
+      currentClip.onended = null;
+      currentClip.onerror = null;
+      currentClip.pause();
+      currentClip = null;
+    }
+
+    // Speech wrapper: plays the Kokoro clip when one exists, otherwise browser speech.
+    // onStartCallback receives the clip duration in ms (null when unknown).
+    function speakText(text, rate = currentSpeechRate, onEndCallback = null, onStartCallback = null) {
+      stopCurrentClip();
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
+
+      let hasFired = false;
+      const finishExecution = () => {
+        if (!hasFired) {
+          hasFired = true;
+          if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
+          if (onEndCallback) onEndCallback();
+        }
+      };
+
+      // Fallback safety timer to prevent a stalled engine or clip from blocking callbacks
+      const estimatedMs = Math.max(1200, (text.length * 700 / rate) + 900);
+      speechSafetyTimer = setTimeout(finishExecution, estimatedMs);
+
+      const clip = findClip(text, rate);
+      if (clip) {
+        playClip(text, rate, clip, finishExecution, onStartCallback);
+      } else {
+        speakWithBrowser(text, rate, finishExecution, onStartCallback);
+      }
+    }
+
+    function playClip(text, rate, clip, onEnd, onStart) {
+      const audio = new Audio(clip.url);
+      audio.preservesPitch = true;
+      audio.webkitPreservesPitch = true;
+      audio.playbackRate = clip.playbackRate;
+      currentClip = audio;
+
+      const fallBack = () => {
+        if (currentClip !== audio) return;
+        stopCurrentClip();
+        speakWithBrowser(text, rate, onEnd, onStart);
+      };
+      audio.onended = onEnd;
+      audio.onerror = fallBack;
+      audio.addEventListener('playing', () => {
+        if (onStart) onStart(audio.duration * 1000 / audio.playbackRate);
+      }, { once: true });
+      audio.play().catch(fallBack);
+    }
+
+    function speakWithBrowser(text, rate, onEnd, onStart) {
+      if (!('speechSynthesis' in window)) {
+        showToast('浏览器不支持语音播放 (Browser lacks Speech Synthesis)', 'error');
+        onEnd();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'zh-CN';
+      utterance.rate = rate;
+      utterance.pitch = 1.0;
+
+      const voices = window.speechSynthesis.getVoices();
+      const zhVoices = voices.filter(v => v.lang.includes('zh') || v.lang.includes('cmn'));
+      if (zhVoices.length > 0) {
+        const preferred = zhVoices.find(v => v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Xiaoxiao') || v.name.includes('Yunxi')) || zhVoices[0];
+        utterance.voice = preferred;
+      }
+
+      utterance.onend = onEnd;
+      utterance.onerror = onEnd;
+      window.speechSynthesis.speak(utterance);
+      if (onStart) onStart(null);
+    }
+
+    function stopSpeech() {
+      stopCurrentClip();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      if (speechSafetyTimer) clearTimeout(speechSafetyTimer);
+      if (karaokeIntervalId) clearInterval(karaokeIntervalId);
+      isFullPlaying = false;
+      resetPlayAllButton();
+      clearAllHighlights();
+    }
+
+    function setSpeed(rate) {
+      currentSpeechRate = rate;
+      document.querySelectorAll('.speed-btn').forEach(b => {
+        b.className = 'speed-btn px-2 py-1 text-xs font-bold rounded-lg bg-white border border-gray-200 text-gray-700 hover:border-bamboo-400';
+      });
+      const idMap = { 0.3: 'speed-03', 0.5: 'speed-05', 0.7: 'speed-07', 0.85: 'speed-085', 1.0: 'speed-10' };
+      const btn = document.getElementById(idMap[rate]);
+      if (btn) {
+        btn.className = 'speed-btn px-2 py-1 text-xs font-black rounded-lg bg-bamboo-600 text-white shadow-xs';
+      }
+      showToast(`语速已切换为 ${rate}x`);
+    }
+
+    function renderDialogue() {
+      const container = document.getElementById('dialogue-container');
+      if (!container) return;
+
+      container.innerHTML = dialogueData.map((item, lineIndex) => {
+        const tokensHtml = item.tokens.map((t, tokenIndex) => {
+          if (t.isPunct) {
+            return `<span class="text-2xl font-black text-gray-700 px-0.5 select-none">${t.char}</span>`;
+          }
+          return `
+            <span class="inline-flex flex-col items-center mx-1 my-1 cursor-pointer char-hover transition-transform group rounded-md p-0.5" 
+                  id="token-${lineIndex}-${tokenIndex}" 
+                  onclick="handleCharacterClick(${lineIndex}, ${tokenIndex})"
+                  title="点击朗读: ${t.char} (${t.py})">
+              <span class="ruby-pinyin text-xs font-black text-bamboo-700 tracking-tight select-none mb-0.5 transition-all pinyin-label">${t.py}</span>
+              <span class="char-span text-2xl md:text-3xl font-black text-gray-900 font-chinese px-1 py-0.5 rounded transition-all group-hover:bg-bamboo-100/80">${t.char}</span>
+            </span>
+          `;
+        }).join('');
+
+        return `
+          <div class="bg-white rounded-3xl p-4 md:p-6 border-2 border-transparent shadow-xs transition-all duration-300" id="dialogue-line-${lineIndex}">
+            <div class="flex items-start gap-3">
+              <div class="w-12 h-12 rounded-2xl flex-shrink-0 flex items-center justify-center text-2xl shadow-inner border ${item.avatarBg}">
+                ${item.avatar}
+              </div>
+
+              <div class="flex-grow">
+                <div class="flex items-center justify-between mb-1">
+                  <div class="flex items-center gap-2">
+                    <span class="font-black text-sm text-gray-800">${item.speaker}</span>
+                    <button onclick="playSingleSentence(${lineIndex})" class="bg-bamboo-50 hover:bg-bamboo-100 text-bamboo-800 border border-bamboo-200 px-2.5 py-0.5 rounded-full text-xs font-bold flex items-center gap-1 transition">
+                      🔊 读本句
+                    </button>
+                  </div>
+                </div>
+
+                <div class="flex flex-wrap items-baseline py-1 leading-loose">
+                  ${tokensHtml}
+                </div>
+
+                <div class="mt-2 text-xs md:text-sm text-gray-500 font-medium italic border-t border-gray-100 pt-2 english-translation-text">
+                  ${item.english}
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Single sentence karaoke synchronized reading
+    function playSingleSentence(lineIndex, onDone = null) {
+      if (karaokeIntervalId) clearInterval(karaokeIntervalId);
+      clearAllHighlights();
+
+      const line = dialogueData[lineIndex];
+      const lineElem = document.getElementById(`dialogue-line-${lineIndex}`);
+      if (lineElem) {
+        lineElem.classList.add('sentence-active-box');
+        lineElem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      const meaningfulTokens = [];
+      line.tokens.forEach((t, tIdx) => {
+        if (!t.isPunct) meaningfulTokens.push(tIdx);
+      });
+
+      // Spread the highlight over the real clip length; estimate from speech rate if unknown
+      const startKaraoke = (durationMs) => {
+        const charDurationMs = durationMs ? durationMs / meaningfulTokens.length : (480 / currentSpeechRate);
+        let currentStep = 0;
+        if (karaokeIntervalId) clearInterval(karaokeIntervalId);
+
+        karaokeIntervalId = setInterval(() => {
+          document.querySelectorAll('.char-reading-active').forEach(e => e.classList.remove('char-reading-active'));
+          if (currentStep < meaningfulTokens.length) {
+            const tIdx = meaningfulTokens[currentStep];
+            const span = document.querySelector(`#token-${lineIndex}-${tIdx} .char-span`);
+            if (span) span.classList.add('char-reading-active');
+            currentStep++;
+          } else {
+            clearInterval(karaokeIntervalId);
+          }
+        }, charDurationMs);
+      };
+
+      speakText(line.rawText, currentSpeechRate, () => {
+        if (karaokeIntervalId) clearInterval(karaokeIntervalId);
+        clearAllHighlights();
+        if (onDone) onDone();
+      }, startKaraoke);
+    }
+
+    // Robust continuous dialogue reader through all 6 sentences
+    function togglePlayFullDialogue() {
+      if (isFullPlaying) {
+        stopSpeech();
+        return;
+      }
+      isFullPlaying = true;
+      fullPlayIndex = 0;
+      document.getElementById('play-all-icon').innerText = '⏸️';
+      document.getElementById('play-all-text').innerText = '暂停播放 (Pause)';
+      playNextFullLine();
+    }
+
+    function playNextFullLine() {
+      if (!isFullPlaying) return;
+      if (fullPlayIndex >= dialogueData.length) {
+        isFullPlaying = false;
+        resetPlayAllButton();
+        clearAllHighlights();
+        showToast('🎉 全文朗读完成！(Dialogue completed)');
+        playSound('win');
+        return;
+      }
+
+      playSingleSentence(fullPlayIndex, () => {
+        fullPlayIndex++;
+        if (isFullPlaying) {
+          setTimeout(playNextFullLine, 500);
+        }
+      });
+    }
+
+    function resetPlayAllButton() {
+      const icon = document.getElementById('play-all-icon');
+      const text = document.getElementById('play-all-text');
+      if (icon) icon.innerText = '▶️';
+      if (text) text.innerText = '全文朗读 (Play All)';
+    }
+
+    function clearAllHighlights() {
+      document.querySelectorAll('.char-reading-active').forEach(el => el.classList.remove('char-reading-active'));
+      document.querySelectorAll('.sentence-active-box').forEach(el => el.classList.remove('sentence-active-box'));
+    }
+
+    function handleCharacterClick(lineIndex, tokenIndex) {
+      playSound('click');
+      const token = dialogueData[lineIndex].tokens[tokenIndex];
+      speakText(token.char, currentSpeechRate);
+
+      currentModalChar = token;
+      document.getElementById('modal-pinyin').innerText = token.py;
+      document.getElementById('modal-hanzi').innerText = token.char;
+      document.getElementById('modal-meaning').innerText = token.en;
+      document.getElementById('char-modal').classList.remove('hidden');
+    }
+
+    function speakCurrentModalChar() {
+      if (currentModalChar) {
+        speakText(currentModalChar.char, currentSpeechRate);
+      }
+    }
+
+    function closeCharModal() {
+      document.getElementById('char-modal').classList.add('hidden');
+    }
+
+    function togglePinyinDisplay(visible) {
+      document.querySelectorAll('.pinyin-label').forEach(el => {
+        el.style.display = visible ? 'inline-block' : 'none';
+      });
+    }
+
+    function toggleEnglishDisplay(visible) {
+      document.querySelectorAll('.english-translation-text').forEach(el => {
+        el.style.display = visible ? 'block' : 'none';
+      });
+    }
+
+    // Flashcard State
+    let currentCardIndex = 0;
+    let isFlipped = false;
+
+    function renderVocabBadges() {
+      const container = document.getElementById('vocab-badges');
+      if (!container) return;
+      container.innerHTML = vocabList.map((item, idx) => `
+        <button onclick="jumpToCard(${idx})" class="badge-btn px-2.5 py-1 text-xs font-bold rounded-lg border transition ${idx === currentCardIndex ? 'bg-bamboo-600 text-white border-bamboo-600' : 'bg-gray-50 text-gray-700 hover:bg-bamboo-50 border-gray-200'}">
+          ${item.hanzi}
+        </button>
+      `).join('');
+    }
+
+    function updateCardUI() {
+      const card = vocabList[currentCardIndex];
+      const showPinyin = document.getElementById('flashcard-pinyin-toggle').checked;
+      
+      document.getElementById('card-counter').innerText = `${currentCardIndex + 1} / ${vocabList.length}`;
+      
+      document.getElementById('card-front-hanzi').innerText = card.hanzi;
+      const frontPinyin = document.getElementById('card-front-pinyin');
+      frontPinyin.innerText = card.pinyin;
+      frontPinyin.style.visibility = showPinyin ? 'visible' : 'hidden';
+
+      document.getElementById('card-back-hanzi').innerText = card.hanzi;
+      document.getElementById('card-back-pinyin').innerText = card.pinyin;
+      document.getElementById('card-back-meaning').innerText = card.en;
+      document.getElementById('card-back-example').innerText = card.example;
+      document.getElementById('card-back-example-en').innerText = card.exampleEn;
+
+      if (isFlipped) flipCurrentCard(false);
+      renderVocabBadges();
+    }
+
+    function flipCurrentCard(forceFlipState = null) {
+      playSound('click');
+      const elem = document.getElementById('flashcard-element');
+      isFlipped = (forceFlipState !== null) ? forceFlipState : !isFlipped;
+      if (isFlipped) {
+        elem.classList.add('card-flipped');
+      } else {
+        elem.classList.remove('card-flipped');
+      }
+    }
+
+    function nextCard() {
+      currentCardIndex = (currentCardIndex + 1) % vocabList.length;
+      updateCardUI();
+    }
+
+    function prevCard() {
+      currentCardIndex = (currentCardIndex - 1 + vocabList.length) % vocabList.length;
+      updateCardUI();
+    }
+
+    function jumpToCard(index) {
+      currentCardIndex = index;
+      updateCardUI();
+    }
+
+    function shuffleCards() {
+      playSound('click');
+      vocabList.sort(() => Math.random() - 0.5);
+      currentCardIndex = 0;
+      updateCardUI();
+      showToast('🔀 卡片已重新打乱 (Shuffled)');
+    }
+
+    // ===============================================
+    // GAME 1: 喂小熊猫吃竹子 (Feed the Panda)
+    // ===============================================
+    let pandaScore = 0;
+    let pandaStreak = 0;
+    let pandaHarvestCount = 0;
+    let currentPandaTarget = null;
+    const pandaPhrases = [
+      '😋 好吃！太甜了！(Yummy!)',
+      '🎋 鲜嫩的竹子！谢谢你！',
+      '🐼 我还想吃！再来一根！',
+      '⭐ 太香了！你真棒！'
+    ];
+
+    function startFeedPandaRound() {
+      // Pick random target word from vocabulary
+      currentPandaTarget = vocabList[Math.floor(Math.random() * vocabList.length)];
+      document.getElementById('panda-target-pinyin').innerText = currentPandaTarget.pinyin;
+      document.getElementById('panda-target-en').innerText = `(${currentPandaTarget.en})`;
+
+      // Pick 3 distractors
+      const distractors = vocabList.filter(v => v.hanzi !== currentPandaTarget.hanzi)
+                                   .sort(() => Math.random() - 0.5)
+                                   .slice(0, 3);
+      const options = [currentPandaTarget, ...distractors].sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById('bamboo-choices-grid');
+      grid.innerHTML = options.map((opt) => `
+        <button onclick="handleFeedBamboo('${opt.hanzi}')" 
+                class="bamboo-card bamboo-float bg-gradient-to-b from-emerald-50 via-bamboo-50 to-emerald-100 hover:from-bamboo-100 hover:to-emerald-200 active:scale-95 border-2 border-bamboo-300 rounded-3xl p-4 flex flex-col items-center justify-center text-center shadow-xs transition group">
+          <span class="text-3xl mb-1 group-hover:scale-110 transition">🎋</span>
+          <span class="text-2xl sm:text-3xl font-black text-emerald-950 font-chinese">${opt.hanzi}</span>
+          <span class="text-xs text-bamboo-700 font-bold mt-1">${opt.pinyin}</span>
+        </button>
+      `).join('');
+
+      // Auto play target audio
+      setTimeout(() => {
+        replayPandaPromptAudio();
+      }, 250);
+    }
+
+    function replayPandaPromptAudio() {
+      if (currentPandaTarget) {
+        speakText(currentPandaTarget.hanzi, currentSpeechRate);
+      }
+    }
+
+    function handleFeedBamboo(selectedHanzi) {
+      const bubble = document.getElementById('panda-speech-bubble');
+      const mascot = document.getElementById('panda-mascot');
+
+      if (selectedHanzi === currentPandaTarget.hanzi) {
+        // Correct Choice
+        playSound('yummy');
+        pandaScore += 10;
+        pandaStreak += 1;
+        pandaHarvestCount += 1;
+
+        document.getElementById('panda-score').innerText = pandaScore;
+        document.getElementById('panda-streak').innerText = `⭐ ${pandaStreak}`;
+        document.getElementById('panda-harvest-count').innerText = `🎋 ${pandaHarvestCount} 根`;
+
+        // Chewing animation
+        mascot.classList.remove('animate-shake-no');
+        mascot.classList.add('animate-chew');
+        const randomHappy = pandaPhrases[Math.floor(Math.random() * pandaPhrases.length)];
+        bubble.innerText = randomHappy;
+        bubble.className = "absolute top-2 bg-emerald-100 px-4 py-1.5 rounded-full border-2 border-emerald-400 shadow-md text-xs sm:text-sm font-black text-emerald-900 transition-all scale-105";
+
+        setTimeout(() => {
+          mascot.classList.remove('animate-chew');
+          startFeedPandaRound();
+        }, 1400);
+
+      } else {
+        // Wrong Choice
+        playSound('wrong');
+        pandaStreak = 0;
+        document.getElementById('panda-streak').innerText = `⭐ 0`;
+
+        mascot.classList.remove('animate-chew');
+        mascot.classList.add('animate-shake-no');
+        bubble.innerText = `😣 呜~ 这个不是 "${currentPandaTarget.hanzi}" 哦！`;
+        bubble.className = "absolute top-2 bg-rose-100 px-4 py-1.5 rounded-full border-2 border-rose-300 shadow-md text-xs sm:text-sm font-black text-rose-700 transition-all";
+
+        setTimeout(() => {
+          mascot.classList.remove('animate-shake-no');
+        }, 600);
+      }
+    }
+
+    // ===============================================
+    // GAME 2: 猴子摘香蕉 · 反义词与字词挑战 (Monkey Game)
+    // ===============================================
+    const monkeyQuestions = [
+      {
+        badge: '反义词关卡 1',
+        title: '“胖” (fat) 的反义词是哪个？',
+        titleZh: '胖的反义词是哪个',
+        en: "What is the opposite of '胖' (fat)?",
+        correct: '瘦',
+        correctPy: 'shòu',
+        options: [
+          { text: '瘦', py: 'shòu' },
+          { text: '快', py: 'kuài' },
+          { text: '慢', py: 'màn' },
+          { text: '小', py: 'xiǎo' }
+        ]
+      },
+      {
+        badge: '反义词关卡 2',
+        title: '“快” (fast) 的反义词是哪个？',
+        titleZh: '快的反义词是哪个',
+        en: "What is the opposite of '快' (fast)?",
+        correct: '慢',
+        correctPy: 'màn',
+        options: [
+          { text: '胖', py: 'pàng' },
+          { text: '慢', py: 'màn' },
+          { text: '瘦', py: 'shòu' },
+          { text: '走', py: 'zǒu' }
+        ]
+      },
+      {
+        badge: '反义词关卡 3',
+        title: '“黑” (black) 的反义词是哪个？',
+        titleZh: '黑的反义词是哪个',
+        en: "What is the opposite of '黑' (black)?",
+        correct: '白',
+        correctPy: 'bái',
+        options: [
+          { text: '红', py: 'hóng' },
+          { text: '蓝', py: 'lán' },
+          { text: '白', py: 'bái' },
+          { text: '绿', py: 'lǜ' }
+        ]
+      },
+      {
+        badge: '课文填空关卡 4',
+        title: '熊猫太胖了，走得___？',
+        titleZh: '熊猫太胖了，走得什么',
+        en: "The panda is too fat, so it moves...?",
+        correct: '慢',
+        correctPy: 'màn',
+        options: [
+          { text: '快', py: 'kuài' },
+          { text: '慢', py: 'màn' },
+          { text: '香', py: 'xiāng' },
+          { text: '跑', py: 'pǎo' }
+        ]
+      },
+      {
+        badge: '课文填空关卡 5',
+        title: '猴子瘦，跑得___？',
+        titleZh: '猴子瘦，跑得什么',
+        en: "The monkey is thin, so it runs...?",
+        correct: '快',
+        correctPy: 'kuài',
+        options: [
+          { text: '慢', py: 'màn' },
+          { text: '胖', py: 'pàng' },
+          { text: '快', py: 'kuài' },
+          { text: '大', py: 'dà' }
+        ]
+      },
+      {
+        badge: '课文理解关卡 6',
+        title: '我给猴子吃什么？(What did I feed it?)',
+        titleZh: '我给猴子吃什么',
+        en: "What fruit did I feed the monkey?",
+        correct: '香蕉',
+        correctPy: 'xiāng jiāo',
+        options: [
+          { text: '香蕉', py: 'xiāng jiāo' },
+          { text: '苹果', py: 'píng guǒ' },
+          { text: '西瓜', py: 'xī guā' },
+          { text: '竹子', py: 'zhú zi' }
+        ]
+      },
+      {
+        badge: '词汇关卡 7',
+        title: '熊猫很___，我喜欢它的颜色。',
+        titleZh: '熊猫很什么，我喜欢它的颜色',
+        en: "Pandas are very cute...",
+        correct: '可爱',
+        correctPy: 'kě ài',
+        options: [
+          { text: '可爱', py: 'kě ài' },
+          { text: '可怕', py: 'kě pà' },
+          { text: '高大', py: 'gāo dà' },
+          { text: '生气', py: 'shēng qì' }
+        ]
+      },
+      {
+        badge: '动作关卡 8',
+        title: '“走” (walk) 对应的动作，猴子更喜欢？',
+        titleZh: '走的相对动作，猴子更喜欢什么',
+        en: "Compared to walk (走), monkeys love to...?",
+        correct: '跑',
+        correctPy: 'pǎo',
+        options: [
+          { text: '坐', py: 'zuò' },
+          { text: '跑', py: 'pǎo' },
+          { text: '睡', py: 'shuì' },
+          { text: '停', py: 'tíng' }
+        ]
+      }
+    ];
+
+    let currentMonkeyIdx = 0;
+    let monkeyBananaCount = 0;
+
+    function initMonkeyGameRound() {
+      const q = monkeyQuestions[currentMonkeyIdx];
+      document.getElementById('monkey-round-badge').innerText = q.badge;
+      document.getElementById('monkey-question-title').innerText = q.title;
+      document.getElementById('monkey-question-en').innerText = q.en;
+      document.getElementById('monkey-feedback').innerHTML = '';
+
+      // Update progress
+      const progressPercent = ((currentMonkeyIdx + 1) / monkeyQuestions.length) * 100;
+      document.getElementById('monkey-progress-fill').style.width = `${progressPercent}%`;
+      document.getElementById('monkey-progress-text').innerText = `${currentMonkeyIdx + 1} / ${monkeyQuestions.length} 关`;
+
+      // Shuffle options
+      const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+      shuffledOptions.forEach((opt, idx) => {
+        document.getElementById(`monkey-text-${idx}`).innerText = opt.text;
+        document.getElementById(`monkey-py-${idx}`).innerText = opt.py;
+        const burrow = document.getElementById(`monkey-hole-${idx}`);
+        burrow.className = "monkey-burrow bg-gradient-to-b from-stone-100 to-stone-200 border-2 border-stone-300 rounded-3xl p-4 flex flex-col items-center justify-center cursor-pointer hover:border-amber-400 active:scale-95 transition min-h-[140px] shadow-inner group";
+      });
+
+      setTimeout(() => {
+        speakMonkeyQuestion();
+      }, 300);
+    }
+
+    function speakMonkeyQuestion() {
+      const q = monkeyQuestions[currentMonkeyIdx];
+      speakText(q.titleZh, currentSpeechRate);
+    }
+
+    function handleMonkeyChoice(holeIndex) {
+      const q = monkeyQuestions[currentMonkeyIdx];
+      const selectedText = document.getElementById(`monkey-text-${holeIndex}`).innerText;
+      const holeElem = document.getElementById(`monkey-hole-${holeIndex}`);
+      const feedback = document.getElementById('monkey-feedback');
+
+      if (selectedText === q.correct) {
+        playSound('correct');
+        monkeyBananaCount += 1;
+        document.getElementById('monkey-banana-count').innerText = `🍌 ${monkeyBananaCount}`;
+        holeElem.className = "monkey-burrow bg-amber-400 border-4 border-amber-500 rounded-3xl p-4 flex flex-col items-center justify-center cursor-default min-h-[140px] shadow-md scale-105 transition";
+        feedback.innerHTML = `<span class="text-amber-700 font-black">🎉 答对啦！摘到大香蕉！Correct: ${q.correct} (${q.correctPy})</span>`;
+
+        setTimeout(() => {
+          if (currentMonkeyIdx < monkeyQuestions.length - 1) {
+            currentMonkeyIdx++;
+            initMonkeyGameRound();
+          } else {
+            playSound('win');
+            feedback.innerHTML = `<span class="text-emerald-700 font-black text-xl">🏆 太棒了！全部 8 关香蕉挑战大通关！</span>`;
+          }
+        }, 1300);
+      } else {
+        playSound('wrong');
+        holeElem.classList.add('border-rose-400', 'bg-rose-100');
+        feedback.innerHTML = `<span class="text-rose-600 font-bold">❌ 哎呀，再想想看！听听题目提示吧！</span>`;
+      }
+    }
+
+    // ===============================================
+    // EXISTING GAME SUITE: Quiz, Match, Sentence
+    // ===============================================
+    function switchSubGame(subGame) {
+      playSound('click');
+      document.querySelectorAll('.game-selector-btn').forEach(btn => {
+        btn.className = 'game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-white text-gray-700 border border-gray-200 hover:border-bamboo-400 shadow-2xs transition';
+      });
+      document.querySelectorAll('.subgame-panel').forEach(panel => panel.classList.add('hidden'));
+
+      if (subGame === 'listen') {
+        document.getElementById('subgame-btn-listen').className = 'game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-bamboo-600 text-white shadow-md transition';
+        document.getElementById('game-panel-listen').classList.remove('hidden');
+        initListeningQuiz();
+      } else if (subGame === 'match') {
+        document.getElementById('subgame-btn-match').className = 'game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-bamboo-600 text-white shadow-md transition';
+        document.getElementById('game-panel-match').classList.remove('hidden');
+        startMatchGame();
+      } else if (subGame === 'sentence') {
+        document.getElementById('subgame-btn-sentence').className = 'game-selector-btn px-5 py-2.5 rounded-2xl text-sm font-black bg-bamboo-600 text-white shadow-md transition';
+        document.getElementById('game-panel-sentence').classList.remove('hidden');
+        initSentenceGame();
+      }
+    }
+
+    let quizScore = 0;
+    let quizStreak = 0;
+    let currentQuizWord = null;
+
+    function initListeningQuiz() {
+      currentQuizWord = vocabList[Math.floor(Math.random() * vocabList.length)];
+      const distractors = vocabList.filter(v => v.hanzi !== currentQuizWord.hanzi)
+                                   .sort(() => Math.random() - 0.5)
+                                   .slice(0, 3);
+      const options = [currentQuizWord, ...distractors].sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById('quiz-options-grid');
+      grid.innerHTML = options.map(opt => `
+        <button onclick="handleQuizAnswer('${opt.hanzi}')" class="quiz-btn bg-bamboo-50 hover:bg-bamboo-100 hover:border-bamboo-500 active:scale-95 border-2 border-bamboo-200 rounded-3xl p-6 text-center shadow-xs transition flex flex-col items-center justify-center">
+          <span class="text-3xl md:text-4xl font-black text-gray-800 font-chinese mb-1">${opt.hanzi}</span>
+          <span class="text-xs text-gray-500 font-bold">(${opt.en})</span>
+        </button>
+      `).join('');
+
+      document.getElementById('quiz-feedback').innerHTML = '';
+      setTimeout(() => {
+        playQuizPromptAudio();
+      }, 300);
+    }
+
+    function playQuizPromptAudio() {
+      if (currentQuizWord) {
+        speakText(currentQuizWord.hanzi, currentSpeechRate);
+      }
+    }
+
+    function handleQuizAnswer(selectedHanzi) {
+      const feedback = document.getElementById('quiz-feedback');
+      if (selectedHanzi === currentQuizWord.hanzi) {
+        playSound('correct');
+        quizScore += 10;
+        quizStreak += 1;
+        document.getElementById('quiz-score').innerText = quizScore;
+        document.getElementById('quiz-streak').innerText = `🔥 ${quizStreak}`;
+        feedback.innerHTML = `<span class="text-bamboo-600 font-black">🎉 回答正确：${currentQuizWord.hanzi} (${currentQuizWord.pinyin})</span>`;
+        
+        setTimeout(() => {
+          initListeningQuiz();
+        }, 1200);
+      } else {
+        playSound('wrong');
+        quizStreak = 0;
+        document.getElementById('quiz-streak').innerText = `🔥 0`;
+        feedback.innerHTML = `<span class="text-rose-500 font-bold">❌ 再听听看哦！点击大喇叭再试一次！</span>`;
+      }
+    }
+
+    // Match Pairs game
+    let matchPairs = [
+      { text: '熊猫', matchKey: 'panda' },
+      { text: '🐼 Panda', matchKey: 'panda' },
+      { text: '猴子', matchKey: 'monkey' },
+      { text: '🐵 Monkey', matchKey: 'monkey' },
+      { text: '胖', matchKey: 'fat' },
+      { text: 'Chubby / Fat', matchKey: 'fat' },
+      { text: '瘦', matchKey: 'thin' },
+      { text: 'Thin / Slim', matchKey: 'thin' },
+      { text: '快', matchKey: 'fast' },
+      { text: '⚡ Fast', matchKey: 'fast' },
+      { text: '慢', matchKey: 'slow' },
+      { text: '🐢 Slow', matchKey: 'slow' }
+    ];
+    let matchFlippedCards = [];
+    let matchedCount = 0;
+    let matchTimerInterval = null;
+    let matchSeconds = 0;
+
+    function startMatchGame() {
+      matchedCount = 0;
+      matchFlippedCards = [];
+      clearInterval(matchTimerInterval);
+      matchSeconds = 0;
+      document.getElementById('match-timer').innerText = '0s';
+      document.getElementById('match-win-banner').classList.add('hidden');
+
+      matchTimerInterval = setInterval(() => {
+        matchSeconds++;
+        document.getElementById('match-timer').innerText = `${matchSeconds}s`;
+      }, 1000);
+
+      const shuffled = [...matchPairs].sort(() => Math.random() - 0.5);
+      const grid = document.getElementById('match-grid');
+      grid.innerHTML = shuffled.map((card, idx) => `
+        <div class="match-card bg-white border-2 border-bamboo-200 hover:border-bamboo-400 rounded-2xl h-24 sm:h-28 flex items-center justify-center p-3 text-center cursor-pointer select-none font-black text-gray-800 shadow-2xs transition active:scale-95" 
+             id="match-card-${idx}" 
+             onclick="handleMatchCardClick(${idx}, '${card.matchKey}', '${card.text}')">
+          <span class="text-base sm:text-lg font-chinese">${card.text}</span>
+        </div>
+      `).join('');
+    }
+
+    function handleMatchCardClick(idx, matchKey, text) {
+      playSound('click');
+      const cardEl = document.getElementById(`match-card-${idx}`);
+      if (cardEl.classList.contains('bg-bamboo-500') || cardEl.classList.contains('bg-amber-100') || matchFlippedCards.length >= 2) {
+        return;
+      }
+
+      cardEl.classList.remove('bg-white');
+      cardEl.classList.add('bg-amber-100', 'border-amber-400');
+      matchFlippedCards.push({ idx, matchKey, text, elem: cardEl });
+
+      if (matchFlippedCards.length === 2) {
+        const [c1, c2] = matchFlippedCards;
+        if (c1.matchKey === c2.matchKey && c1.idx !== c2.idx) {
+          playSound('correct');
+          setTimeout(() => {
+            c1.elem.className = 'match-card bg-bamboo-500 text-white rounded-2xl h-24 sm:h-28 flex items-center justify-center p-3 text-center select-none font-black shadow-inner cursor-default';
+            c2.elem.className = 'match-card bg-bamboo-500 text-white rounded-2xl h-24 sm:h-28 flex items-center justify-center p-3 text-center select-none font-black shadow-inner cursor-default';
+            matchFlippedCards = [];
+            matchedCount += 2;
+            if (matchedCount === matchPairs.length) {
+              clearInterval(matchTimerInterval);
+              playSound('win');
+              document.getElementById('match-win-banner').classList.remove('hidden');
+            }
+          }, 350);
+        } else {
+          playSound('wrong');
+          setTimeout(() => {
+            c1.elem.classList.remove('bg-amber-100', 'border-amber-400');
+            c1.elem.classList.add('bg-white');
+            c2.elem.classList.remove('bg-amber-100', 'border-amber-400');
+            c2.elem.classList.add('bg-white');
+            matchFlippedCards = [];
+          }, 700);
+        }
+      }
+    }
+
+    // Sentence Scramble Game
+    const sentenceChallenges = [
+      {
+        targetEn: 'Where are you going this Sunday?',
+        correctTokens: ['星期天', '你', '想', '去', '哪儿', '？'],
+        fullZh: '星期天你想去哪儿？'
+      },
+      {
+        targetEn: 'My Dad and I want to go to the zoo.',
+        correctTokens: ['我', '和', '爸爸', '想', '去', '动物园', '。'],
+        fullZh: '我和爸爸想去动物园。'
+      },
+      {
+        targetEn: 'Pandas are very fat, and they move slow.',
+        correctTokens: ['熊猫', '太', '胖了', '，', '走得慢', '。'],
+        fullZh: '熊猫太胖了，走得慢。'
+      },
+      {
+        targetEn: 'Monkeys are thin, so they move fast.',
+        correctTokens: ['猴子', '瘦', '，', '跑得快', '。'],
+        fullZh: '猴子瘦，跑得快。'
+      }
+    ];
+
+    let currentSentenceIdx = 0;
+    let selectedTokens = [];
+    let poolTokens = [];
+
+    function initSentenceGame() {
+      const challenge = sentenceChallenges[currentSentenceIdx];
+      document.getElementById('sentence-progress').innerText = `第 ${currentSentenceIdx + 1} / ${sentenceChallenges.length} 题`;
+      document.getElementById('target-sentence-en').innerText = challenge.targetEn;
+      document.getElementById('sentence-feedback').innerText = '';
+      document.getElementById('btn-sentence-listen').classList.add('hidden');
+      
+      poolTokens = [...challenge.correctTokens].sort(() => Math.random() - 0.5);
+      selectedTokens = [];
+      renderSentenceZones();
+    }
+
+    function renderSentenceZones() {
+      const answerZone = document.getElementById('sentence-answer-zone');
+      const poolZone = document.getElementById('sentence-pool-zone');
+
+      if (selectedTokens.length === 0) {
+        answerZone.innerHTML = `<span class="text-gray-400 text-sm select-none" id="empty-placeholder">点击下方词块放入此处...</span>`;
+      } else {
+        answerZone.innerHTML = selectedTokens.map((word, idx) => `
+          <button onclick="removeTokenFromAnswer(${idx})" class="bg-bamboo-600 text-white font-black px-3.5 py-2 rounded-xl shadow-xs text-base active:scale-95 transition flex items-center gap-1">
+            <span>${word}</span>
+            <span class="text-xs text-bamboo-200">✕</span>
+          </button>
+        `).join('');
+      }
+
+      poolZone.innerHTML = poolTokens.map((word, idx) => `
+        <button onclick="addTokenToAnswer(${idx})" class="bg-white hover:bg-bamboo-100 border-2 border-bamboo-200 font-black text-gray-800 px-4 py-2 rounded-xl shadow-2xs text-base active:scale-95 transition">
+          ${word}
+        </button>
+      `).join('');
+    }
+
+    function addTokenToAnswer(poolIndex) {
+      playSound('click');
+      const word = poolTokens[poolIndex];
+      selectedTokens.push(word);
+      poolTokens.splice(poolIndex, 1);
+      renderSentenceZones();
+    }
+
+    function removeTokenFromAnswer(answerIndex) {
+      playSound('click');
+      const word = selectedTokens[answerIndex];
+      poolTokens.push(word);
+      selectedTokens.splice(answerIndex, 1);
+      renderSentenceZones();
+    }
+
+    function resetCurrentSentence() {
+      playSound('click');
+      const challenge = sentenceChallenges[currentSentenceIdx];
+      poolTokens = [...challenge.correctTokens].sort(() => Math.random() - 0.5);
+      selectedTokens = [];
+      renderSentenceZones();
+      document.getElementById('sentence-feedback').innerText = '';
+    }
+
+    function checkSentence() {
+      const challenge = sentenceChallenges[currentSentenceIdx];
+      const answerStr = selectedTokens.join('');
+      const correctStr = challenge.correctTokens.join('');
+      const feedback = document.getElementById('sentence-feedback');
+
+      if (answerStr === correctStr) {
+        playSound('correct');
+        feedback.innerHTML = `<span class="text-bamboo-600 font-black">🎉 恭喜拼对了！句子完全正确！</span>`;
+        document.getElementById('btn-sentence-listen').classList.remove('hidden');
+        speakText(challenge.fullZh, currentSpeechRate);
+
+        setTimeout(() => {
+          if (currentSentenceIdx < sentenceChallenges.length - 1) {
+            currentSentenceIdx++;
+            initSentenceGame();
+          } else {
+            playSound('win');
+            feedback.innerHTML = `<span class="text-bamboo-700 font-black">🏆 太棒了！全部连词成句通关！</span>`;
+          }
+        }, 2200);
+      } else {
+        playSound('wrong');
+        feedback.innerHTML = `<span class="text-rose-500 font-black">词序不太对哦，点击单词拿回重试！</span>`;
+      }
+    }
+
+    function speakAnswerSentence() {
+      const challenge = sentenceChallenges[currentSentenceIdx];
+      speakText(challenge.fullZh, currentSpeechRate);
+    }
+
+    // Navigation routing
+    function switchTab(tabId) {
+      playSound('click');
+      stopSpeech();
+
+      document.querySelectorAll('.nav-tab').forEach(tab => {
+        tab.className = 'nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-gray-600 hover:text-bamboo-700 transition flex items-center gap-1 whitespace-nowrap';
+      });
+      const activeBtn = document.getElementById(`nav-${tabId}`);
+      if (activeBtn) {
+        activeBtn.className = 'nav-tab px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition flex items-center gap-1 bg-white text-bamboo-800 shadow-xs whitespace-nowrap';
+      }
+
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      const activeSection = document.getElementById(`tab-${tabId}`);
+      if (activeSection) {
+        activeSection.classList.remove('hidden');
+      }
+
+      if (tabId === 'flashcards') {
+        updateCardUI();
+      } else if (tabId === 'feedpanda') {
+        startFeedPandaRound();
+      } else if (tabId === 'monkey') {
+        initMonkeyGameRound();
+      } else if (tabId === 'games') {
+        switchSubGame('listen');
+      }
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const bg = type === 'error' ? 'bg-rose-500 text-white' : 'bg-gray-800 text-white';
+      toast.className = `${bg} px-4 py-2.5 rounded-2xl shadow-lg text-xs md:text-sm font-bold transition-all duration-300 pointer-events-auto transform translate-y-2 opacity-0 flex items-center gap-2`;
+      toast.innerText = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2500);
+    }
+
+    // App Startup
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDialogue();
+      updateCardUI();
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.getVoices();
+        };
+      }
+    });
+  </script>
+</body>
+</html>

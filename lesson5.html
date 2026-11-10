@@ -1,0 +1,1639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>第五课 他是从中国来的 - 中文互动教学课件</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+    body {
+      font-family: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    /* Pinyin Ruby Styling */
+    ruby {
+      ruby-position: over;
+      ruby-align: center;
+      margin: 0 1.5px;
+      display: inline-flex;
+      flex-direction: column-reverse;
+      vertical-align: bottom;
+      text-align: center;
+    }
+    rt {
+      font-size: 0.68em;
+      line-height: 1.1;
+      font-weight: 600;
+      color: #2563eb;
+      letter-spacing: -0.02em;
+      user-select: text;
+    }
+    
+    /* Pinyin hide utility */
+    .hide-pinyin rt {
+      display: none !important;
+    }
+    /* English hide utility */
+    .hide-english .english-text {
+      display: none !important;
+    }
+
+    /* Word Highlight Interactive Token */
+    .vocab-token {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 6px;
+      padding: 1px 4px;
+      cursor: pointer;
+    }
+    .vocab-token:hover {
+      background-color: #fef08a;
+      box-shadow: 0 2px 6px rgba(234, 179, 8, 0.25);
+      transform: translateY(-1px);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    /* Pulse animation for active speaking card */
+    @keyframes cardGlow {
+      0%, 100% { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.8); }
+    }
+    .speaking-card {
+      animation: cardGlow 1.8s infinite;
+      border-color: #3b82f6 !important;
+      background-color: #eff6ff !important;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-sky-50 to-indigo-50 min-h-screen text-slate-800 flex flex-col antialiased pb-12">
+
+  <!-- ================= Top Nav Header ================= -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-sky-100 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <!-- Title & Chapter Tag -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-200 shrink-0">
+          <i data-lucide="book-open-check" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 text-sky-700">Lesson 5</span>
+            <span class="text-xs text-slate-400 font-medium hidden sm:inline">双语互动课件</span>
+          </div>
+          <h1 class="text-base sm:text-lg font-black text-slate-900 tracking-tight leading-tight">
+            他是从中国来的 <span class="text-xs sm:text-sm font-semibold text-slate-500 font-normal">He comes from China</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Quick Toggles Toolbar -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        <!-- Pinyin Toggle -->
+        <button id="toggle-pinyin-btn" onclick="togglePinyin()" title="显示/隐藏拼音" 
+          class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-sky-600 hover:bg-sky-50 active:scale-95 transition flex items-center gap-1 shadow-sm">
+          <i data-lucide="languages" class="w-4 h-4"></i>
+          <span id="pinyin-status-text">拼音: 开</span>
+        </button>
+
+        <!-- English Toggle -->
+        <button id="toggle-english-btn" onclick="toggleEnglish()" title="显示/隐藏英文翻译" 
+          class="px-2.5 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-indigo-600 hover:bg-indigo-50 active:scale-95 transition flex items-center gap-1 shadow-sm">
+          <i data-lucide="message-square" class="w-4 h-4"></i>
+          <span id="english-status-text">英文: 开</span>
+        </button>
+
+        <!-- Sound FX Mute Toggle -->
+        <button id="toggle-sfx-btn" onclick="toggleSFX()" title="音效开关"
+          class="p-2 rounded-xl border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 active:scale-95 transition shadow-sm">
+          <i id="sfx-icon" data-lucide="volume-2" class="w-4 h-4 text-emerald-600"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Speed & Voice Selector Secondary Ribbon -->
+    <div class="bg-sky-50/80 border-t border-sky-100/60 px-4 py-2">
+      <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+        <!-- Speed Buttons -->
+        <div class="flex items-center gap-1">
+          <span class="font-bold text-slate-500 mr-1 flex items-center gap-1">
+            <i data-lucide="gauge" class="w-3.5 h-3.5"></i>语速:
+          </span>
+          <div class="inline-flex bg-white p-0.5 rounded-lg border border-slate-200 shadow-sm" id="speed-btn-group">
+            <button onclick="setSpeed(0.3)" class="speed-btn px-2 py-0.5 rounded-md text-slate-600 hover:bg-slate-100 font-semibold" data-speed="0.3">0.3x</button>
+            <button onclick="setSpeed(0.5)" class="speed-btn px-2 py-0.5 rounded-md text-slate-600 hover:bg-slate-100 font-semibold" data-speed="0.5">0.5x</button>
+            <button onclick="setSpeed(0.7)" class="speed-btn px-2 py-0.5 rounded-md text-slate-600 hover:bg-slate-100 font-semibold" data-speed="0.7">0.7x</button>
+            <button onclick="setSpeed(0.85)" class="speed-btn px-2 py-0.5 rounded-md bg-sky-500 text-white font-bold" data-speed="0.85">0.85x</button>
+            <button onclick="setSpeed(1.0)" class="speed-btn px-2 py-0.5 rounded-md text-slate-600 hover:bg-slate-100 font-semibold" data-speed="1.0">1.0x</button>
+          </div>
+        </div>
+
+        <!-- Voice Status Tag & Fallback notice -->
+        <div class="flex items-center gap-2">
+          <span class="text-slate-500 flex items-center gap-1 font-medium">
+            <i data-lucide="mic-vocal" class="w-3.5 h-3.5 text-sky-600"></i>
+            <span id="current-voice-label" class="truncate max-w-[150px] sm:max-w-[200px]">检测语音中...</span>
+          </span>
+          <select id="voice-select" onchange="changeVoice(this.value)" class="text-xs bg-white border border-slate-200 rounded-lg px-2 py-0.5 text-slate-700 outline-none focus:ring-1 focus:ring-sky-500">
+            <option value="">默认普通话引擎</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= Tab Navigation ================= -->
+  <main class="max-w-5xl mx-auto px-4 mt-4 w-full flex-1 flex flex-col">
+    <!-- Mode Tabs -->
+    <div class="flex items-center gap-2 border-b border-slate-200 pb-2 mb-4 overflow-x-auto no-scrollbar">
+      <button onclick="switchTab('dialogue')" id="tab-btn-dialogue" 
+        class="tab-btn active px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-sky-600 text-white shadow-sm shadow-sky-200 transition shrink-0">
+        <i data-lucide="messages-square" class="w-4 h-4"></i>
+        情境对话 (Dialogue)
+      </button>
+      <button onclick="switchTab('roleplay')" id="tab-btn-roleplay" 
+        class="tab-btn px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-sky-50 transition shrink-0">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        分角色扮演 (Role-Play)
+      </button>
+      <button onclick="switchTab('vocab')" id="tab-btn-vocab" 
+        class="tab-btn px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-sky-50 transition shrink-0">
+        <i data-lucide="sparkles" class="w-4 h-4"></i>
+        核心生词卡 (Vocabulary)
+      </button>
+      <button onclick="switchTab('practice')" id="tab-btn-practice" 
+        class="tab-btn px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-sky-50 transition shrink-0">
+        <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+        趣味闯关 (Quiz & Games)
+      </button>
+    </div>
+
+    <!-- ================= TAB 1: Dialogue (课文情境对话) ================= -->
+    <section id="tab-content-dialogue" class="tab-pane flex flex-col gap-4">
+      <!-- Master Audio Action Bar -->
+      <div class="bg-gradient-to-r from-sky-500 via-blue-500 to-indigo-600 text-white p-4 rounded-2xl shadow-lg flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-white/20 rounded-2xl backdrop-blur-sm flex items-center justify-center text-white shrink-0">
+            <i data-lucide="headphones" class="w-7 h-7"></i>
+          </div>
+          <div>
+            <h2 class="text-base font-black tracking-wide flex items-center gap-2">
+              全文连读与沉浸学习
+              <span id="playing-indicator" class="hidden text-xs bg-emerald-400 text-slate-900 px-2 py-0.5 rounded-full font-bold animate-pulse">正在朗读...</span>
+            </h2>
+            <p class="text-xs text-sky-100 font-medium">支持句子自动高亮平滑递进，点击字词可单独探究发音与含义</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Play all -->
+          <button id="play-all-btn" onclick="startContinuousPlay()" 
+            class="px-4 py-2 rounded-xl bg-white text-sky-700 font-bold text-sm shadow hover:bg-sky-50 active:scale-95 transition flex items-center gap-2">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            <span>全文朗读</span>
+          </button>
+          <!-- Stop -->
+          <button id="stop-all-btn" onclick="stopContinuousPlay()" 
+            class="px-3.5 py-2 rounded-xl bg-white/20 hover:bg-white/30 text-white font-bold text-sm active:scale-95 transition flex items-center gap-1.5">
+            <i data-lucide="square" class="w-4 h-4"></i>
+            <span>停止</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Dialogue Cards List -->
+      <div id="dialogue-container" class="flex flex-col gap-3.5">
+        <!-- Rendered dynamically by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: Role Play (分角色演练) ================= -->
+    <section id="tab-content-roleplay" class="tab-pane hidden flex flex-col gap-4">
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="drama" class="w-5 h-5 text-indigo-600"></i>
+              互动配音：请选择你想扮演的角色
+            </h3>
+            <p class="text-xs text-slate-500 mt-0.5">电脑将朗读另一个角色的台词，当轮到你时，请朗读己方台词！</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button id="pick-yangyang-btn" onclick="selectRole('yangyang')" 
+              class="role-select-btn px-4 py-2 rounded-xl border-2 border-sky-400 bg-sky-50 font-bold text-sm text-sky-800 flex items-center gap-2 shadow-sm transition">
+              <span class="w-6 h-6 rounded-full bg-sky-200 flex items-center justify-center text-xs">👦</span>
+              我是阳阳 (Yangyang)
+            </button>
+            <button id="pick-xiaoxi-btn" onclick="selectRole('xiaoxi')" 
+              class="role-select-btn px-4 py-2 rounded-xl border-2 border-slate-200 bg-white font-bold text-sm text-slate-600 hover:bg-rose-50 flex items-center gap-2 shadow-sm transition">
+              <span class="w-6 h-6 rounded-full bg-rose-200 flex items-center justify-center text-xs">👧</span>
+              我是小西 (Xiaoxi)
+            </button>
+          </div>
+        </div>
+
+        <!-- Roleplay Progress & Action Board -->
+        <div class="mt-4 flex flex-col items-center justify-center text-center p-6 bg-slate-50/80 rounded-2xl border border-slate-200/60" id="roleplay-status-box">
+          <div id="roleplay-step-badge" class="text-xs font-bold px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full mb-3">
+            准备开始对话
+          </div>
+          <div id="roleplay-avatar-prompt" class="w-16 h-16 rounded-full bg-white shadow-md flex items-center justify-center text-3xl mb-3 border-2 border-indigo-200">
+            🎬
+          </div>
+          <h4 id="roleplay-instruction" class="text-base font-bold text-slate-800 max-w-md">
+            点击“开始角色扮演”体验原汁原味真实对练！
+          </h4>
+          <p id="roleplay-subtext" class="text-xs text-slate-500 mt-1 max-w-sm">
+            AI 发音人会自动完成对方回合，并无缝提示您开口！
+          </p>
+
+          <div class="mt-5 flex items-center gap-3">
+            <button id="roleplay-start-btn" onclick="startRoleplayDialogue()" 
+              class="px-6 py-2.5 rounded-xl bg-indigo-600 text-white font-bold text-sm shadow-md shadow-indigo-200 hover:bg-indigo-700 active:scale-95 transition flex items-center gap-2">
+              <i data-lucide="play-circle" class="w-5 h-5"></i>
+              开始演练
+            </button>
+            <button id="roleplay-user-done-btn" onclick="finishUserTurn()" 
+              class="hidden px-6 py-2.5 rounded-xl bg-emerald-600 text-white font-bold text-sm shadow-md shadow-emerald-200 hover:bg-emerald-700 active:scale-95 transition flex items-center gap-2 animate-bounce">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
+              我读完了！下一句
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dialogue Preview with role markers -->
+      <div id="roleplay-lines-list" class="flex flex-col gap-3">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: Vocabulary Cards (核心词汇) ================= -->
+    <section id="tab-content-vocab" class="tab-pane hidden flex flex-col gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+            <i data-lucide="layers" class="w-5 h-5 text-amber-500"></i>
+            第五课重点词汇与句式 (Core Vocabulary)
+          </h3>
+          <p class="text-xs text-slate-500 mt-0.5">点击任意卡片试听标准普通话发音与例句解析</p>
+        </div>
+        <span class="text-xs font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">共 8 个关键知识点</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5" id="vocab-cards-grid">
+        <!-- Built by JS -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: Practice Games (闯关与测试) ================= -->
+    <section id="tab-content-practice" class="tab-pane hidden flex flex-col gap-6">
+      <!-- Game 1: 连词成句 (Sentence Builder) -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-black text-sm">1</div>
+            <div>
+              <h3 class="font-bold text-slate-800 text-sm sm:text-base">连词成句小能手 (Sentence Scramble)</h3>
+              <p class="text-xs text-slate-400">点击下方打乱的词块，按顺序拼出正确的句子</p>
+            </div>
+          </div>
+          <button onclick="initSentenceGame()" class="text-xs font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>重置题目
+          </button>
+        </div>
+
+        <div class="mt-4">
+          <div class="text-xs font-bold text-slate-500 mb-1 flex items-center justify-between">
+            <span id="scramble-hint-target">目标句英文释义: ...</span>
+            <span id="scramble-score-tag" class="text-sky-600">关卡 1/3</span>
+          </div>
+
+          <!-- Answer Dropzone Area -->
+          <div id="sentence-dropzone" class="min-h-[58px] p-3 rounded-xl bg-slate-50 border-2 border-dashed border-sky-300 flex flex-wrap items-center gap-2">
+            <span id="dropzone-empty-tip" class="text-xs text-slate-400 italic">点击词块填入这里...</span>
+          </div>
+
+          <!-- Word Bank Options -->
+          <div id="sentence-wordbank" class="mt-4 flex flex-wrap items-center gap-2.5 pt-2">
+            <!-- Word badges generated dynamically -->
+          </div>
+
+          <!-- Action Control -->
+          <div class="mt-5 flex items-center justify-end gap-3">
+            <button onclick="clearCurrentAnswer()" class="px-4 py-1.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 active:scale-95 transition">
+              清空重填
+            </button>
+            <button onclick="checkSentenceAnswer()" class="px-5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs sm:text-sm shadow-md shadow-amber-200 active:scale-95 transition flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              检查句子
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Game 2: 课文理解与听音选择题 (Comprehension & Listening Quiz) -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+        <div class="flex items-center gap-2 pb-3 border-b border-slate-100">
+          <div class="w-8 h-8 rounded-xl bg-sky-100 text-sky-700 flex items-center justify-center font-black text-sm">2</div>
+          <div>
+            <h3 class="font-bold text-slate-800 text-sm sm:text-base">课文理解测验 (Reading & Listening Quiz)</h3>
+            <p class="text-xs text-slate-400">结合课文情节做出选择，答对有欢呼礼花哦！</p>
+          </div>
+        </div>
+
+        <div id="quiz-container" class="mt-4 flex flex-col gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= Word Explainer Modal / Bottom Drawer ================= -->
+  <div id="vocab-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm hidden flex items-end sm:items-center justify-center p-0 sm:p-4 transition-opacity duration-300">
+    <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl border border-slate-100 transform transition-transform">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xl font-black shadow-md shadow-amber-200">
+            <span id="modal-char-avatar">字</span>
+          </div>
+          <div>
+            <h4 id="modal-word-title" class="text-xl font-black text-slate-900 tracking-tight">生词</h4>
+            <div id="modal-word-pinyin" class="text-sm font-bold text-blue-600">pīnyīn</div>
+          </div>
+        </div>
+
+        <button onclick="closeVocabModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 hover:bg-slate-200 flex items-center justify-center transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="mt-4 space-y-3">
+        <div class="bg-amber-50/70 border border-amber-100 rounded-xl p-3">
+          <div class="text-xs font-bold text-amber-700 uppercase tracking-wider">英文解释 (Meaning)</div>
+          <div id="modal-word-meaning" class="text-sm font-semibold text-slate-800 mt-0.5">Meaning here</div>
+        </div>
+
+        <div class="bg-slate-50 border border-slate-100 rounded-xl p-3">
+          <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">课文例句 (Context Example)</div>
+          <div id="modal-word-example" class="text-sm font-medium text-slate-700 mt-1 leading-relaxed">例句加载中</div>
+        </div>
+      </div>
+
+      <div class="mt-5 flex gap-2">
+        <button id="modal-pronounce-btn" onclick="speakModalWord()" 
+          class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm shadow-md shadow-sky-200 active:scale-95 transition flex items-center justify-center gap-2">
+          <i data-lucide="volume-2" class="w-4 h-4"></i>
+          朗读发音 (Listen)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Message Container -->
+  <div id="toast-box" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-3">
+    <div id="toast-content" class="bg-slate-900/90 text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-md flex items-center gap-2">
+      <i id="toast-icon" data-lucide="info" class="w-4 h-4 text-sky-400"></i>
+      <span id="toast-message">提示内容</span>
+    </div>
+  </div>
+
+  <!-- ================= App Engine & Data Logic ================= -->
+  <script>
+    /* ==========================================================
+       1. Core Dialogue & Educational Data Source
+       ========================================================== */
+    const DIALOGUE_DATA = [
+      {
+        id: 1,
+        speaker: 'yangyang',
+        speakerName: '阳阳',
+        speakerEn: 'Yangyang',
+        gender: 'male',
+        roleColor: 'sky',
+        avatar: '👦',
+        text: '北北不在教室里，她去哪儿了？',
+        tokens: [
+          { hanzi: '北北', pinyin: 'Běibei', key: false },
+          { hanzi: '不在', pinyin: 'bú zài', key: false },
+          { hanzi: '教室', pinyin: 'jiàoshì', key: true, en: 'Classroom' },
+          { hanzi: '里', pinyin: 'lǐ', key: false },
+          { hanzi: '，', pinyin: '', punct: true },
+          { hanzi: '她', pinyin: 'tā', key: false },
+          { hanzi: '去', pinyin: 'qù', key: false },
+          { hanzi: '哪儿', pinyin: 'nǎr', key: false },
+          { hanzi: '了', pinyin: 'le', key: false },
+          { hanzi: '？', pinyin: '', punct: true }
+        ],
+        pinyinFull: 'Běibei bú zài jiàoshì lǐ, tā qù nǎr le?',
+        english: 'Beibei is not here in the classroom. Where did she go?'
+      },
+      {
+        id: 2,
+        speaker: 'xiaoxi',
+        speakerName: '小西',
+        speakerEn: 'Xiaoxi',
+        gender: 'female',
+        roleColor: 'rose',
+        avatar: '👧',
+        text: '她和她爸爸，还有弟弟、妹妹，昨天一起去中国了。',
+        tokens: [
+          { hanzi: '她', pinyin: 'Tā', key: false },
+          { hanzi: '和', pinyin: 'hé', key: false },
+          { hanzi: '她', pinyin: 'tā', key: false },
+          { hanzi: '爸爸', pinyin: 'bàba', key: false },
+          { hanzi: '，', pinyin: '', punct: true },
+          { hanzi: '还有', pinyin: 'hái yǒu', key: false },
+          { hanzi: '弟弟', pinyin: 'dìdi', key: false },
+          { hanzi: '、', pinyin: '', punct: true },
+          { hanzi: '妹妹', pinyin: 'mèimei', key: false },
+          { hanzi: '，', pinyin: '', punct: true },
+          { hanzi: '昨天', pinyin: 'zuótiān', key: true, en: 'Yesterday' },
+          { hanzi: '一起', pinyin: 'yìqǐ', key: true, en: 'Together' },
+          { hanzi: '去', pinyin: 'qù', key: false },
+          { hanzi: '中国', pinyin: 'Zhōngguó', key: false },
+          { hanzi: '了', pinyin: 'le', key: false },
+          { hanzi: '。', pinyin: '', punct: true }
+        ],
+        pinyinFull: 'Tā hé tā bàba, hái yǒu dìdi, mèimei, zuótiān yìqǐ qù Zhōngguó le.',
+        english: 'She went to China yesterday with her father, brother and sister.'
+      },
+      {
+        id: 3,
+        speaker: 'yangyang',
+        speakerName: '阳阳',
+        speakerEn: 'Yangyang',
+        gender: 'male',
+        roleColor: 'sky',
+        avatar: '👦',
+        text: '他们是去中国旅游吧？',
+        tokens: [
+          { hanzi: '他们', pinyin: 'Tāmen', key: false },
+          { hanzi: '是', pinyin: 'shì', key: false },
+          { hanzi: '去', pinyin: 'qù', key: false },
+          { hanzi: '中国', pinyin: 'Zhōngguó', key: false },
+          { hanzi: '旅游', pinyin: 'lǚyóu', key: true, en: 'Travel / Tour' },
+          { hanzi: '吧', pinyin: 'ba', key: false },
+          { hanzi: '？', pinyin: '', punct: true }
+        ],
+        pinyinFull: 'Tāmen shì qù Zhōngguó lǚyóu ba?',
+        english: 'They are touring China, right?'
+      },
+      {
+        id: 4,
+        speaker: 'xiaoxi',
+        speakerName: '小西',
+        speakerEn: 'Xiaoxi',
+        gender: 'female',
+        roleColor: 'rose',
+        avatar: '👧',
+        text: '不，她爸爸是从中国来的。她的爷爷和奶奶都在中国。',
+        tokens: [
+          { hanzi: '不', pinyin: 'Bù', key: false },
+          { hanzi: '，', pinyin: '', punct: true },
+          { hanzi: '她', pinyin: 'tā', key: false },
+          { hanzi: '爸爸', pinyin: 'bàba', key: false },
+          { hanzi: '是', pinyin: 'shì', key: false },
+          { hanzi: '从……来', pinyin: 'cóng... lái', key: true, en: 'Come from...' },
+          { hanzi: '中国', pinyin: 'Zhōngguó', key: false },
+          { hanzi: '来的', pinyin: 'lái de', key: false },
+          { hanzi: '。', pinyin: '', punct: true },
+          { hanzi: '她', pinyin: 'tā', key: false },
+          { hanzi: '的', pinyin: 'de', key: false },
+          { hanzi: '爷爷', pinyin: 'yéye', key: true, en: 'Paternal Grandfather' },
+          { hanzi: '和', pinyin: 'hé', key: false },
+          { hanzi: '奶奶', pinyin: 'nǎinai', key: true, en: 'Paternal Grandmother' },
+          { hanzi: '都', pinyin: 'dōu', key: false },
+          { hanzi: '在', pinyin: 'zài', key: false },
+          { hanzi: '中国', pinyin: 'Zhōngguó', key: false },
+          { hanzi: '。', pinyin: '', punct: true }
+        ],
+        pinyinFull: 'Bù, tā bàba shì cóng Zhōngguó lái de. Tā de yéye hé nǎinai dōu zài Zhōngguó.',
+        english: 'No. Her father originally came from China. Her grandpa and grandma are both in China now.'
+      },
+      {
+        id: 5,
+        speaker: 'yangyang',
+        speakerName: '阳阳',
+        speakerEn: 'Yangyang',
+        gender: 'male',
+        roleColor: 'sky',
+        avatar: '👦',
+        text: '现在不是春节，去中国做什么？',
+        tokens: [
+          { hanzi: '现在', pinyin: 'Xiànzài', key: false },
+          { hanzi: '不是', pinyin: 'bú shì', key: false },
+          { hanzi: '春节', pinyin: 'chūnjié', key: true, en: 'Spring Festival / Chinese New Year' },
+          { hanzi: '，', pinyin: '', punct: true },
+          { hanzi: '去', pinyin: 'qù', key: false },
+          { hanzi: '中国', pinyin: 'Zhōngguó', key: false },
+          { hanzi: '做', pinyin: 'zuò', key: false },
+          { hanzi: '什么', pinyin: 'shénme', key: false },
+          { hanzi: '？', pinyin: '', punct: true }
+        ],
+        pinyinFull: 'Xiànzài bú shì chūnjié, qù Zhōngguó zuò shénme?',
+        english: 'It is not the Spring Festival now. Why did they go to China?'
+      },
+      {
+        id: 6,
+        speaker: 'xiaoxi',
+        speakerName: '小西',
+        speakerEn: 'Xiaoxi',
+        gender: 'female',
+        roleColor: 'rose',
+        avatar: '👧',
+        text: '她爷爷生病了，她想去看爷爷。',
+        tokens: [
+          { hanzi: '她', pinyin: 'Tā', key: false },
+          { hanzi: '爷爷', pinyin: 'yéye', key: false },
+          { hanzi: '生病', pinyin: 'shēngbìng', key: true, en: 'Fall ill / Be sick' },
+          { hanzi: '了', pinyin: 'le', key: false },
+          { hanzi: '，', pinyin: '', punct: true },
+          { hanzi: '她', pinyin: 'tā', key: false },
+          { hanzi: '想', pinyin: 'xiǎng', key: false },
+          { hanzi: '去', pinyin: 'qù', key: false },
+          { hanzi: '看', pinyin: 'kàn', key: false },
+          { hanzi: '爷爷', pinyin: 'yéye', key: false },
+          { hanzi: '。', pinyin: '', punct: true }
+        ],
+        pinyinFull: 'Tā yéye shēngbìng le, tā xiǎng qù kàn yéye.',
+        english: 'Because her grandpa is ill and she wanted to go and see him.'
+      }
+    ];
+
+    const VOCAB_DATABASE = [
+      {
+        char: '教室',
+        pinyin: 'jiào shì',
+        meaning: 'Classroom (A room in which a class of pupils is taught)',
+        example: '北北不在教室里。 (Beibei is not in the classroom.)'
+      },
+      {
+        char: '旅游',
+        pinyin: 'lǚ yóu',
+        meaning: 'Travel / Tour / Sightseeing',
+        example: '他们是去中国旅游吧？ (Are they going to China to travel?)'
+      },
+      {
+        char: '从……来',
+        pinyin: 'cóng ... lái',
+        meaning: 'Come from (Indicates origin or birthplace)',
+        example: '她爸爸是从中国来的。 (Her dad came from China.)'
+      },
+      {
+        char: '春节',
+        pinyin: 'chūn jié',
+        meaning: 'Spring Festival (Chinese Lunar New Year)',
+        example: '现在不是春节。 (It is not Spring Festival right now.)'
+      },
+      {
+        char: '生病',
+        pinyin: 'shēng bìng',
+        meaning: 'Fall ill / Become sick',
+        example: '她爷爷生病了。 (Her grandpa fell ill.)'
+      },
+      {
+        char: '爷爷',
+        pinyin: 'yé ye',
+        meaning: 'Paternal Grandfather (Father\'s father)',
+        example: '她的爷爷和奶奶都在中国。 (Her grandpa & grandma are in China.)'
+      },
+      {
+        char: '奶奶',
+        pinyin: 'nǎi nai',
+        meaning: 'Paternal Grandmother (Father\'s mother)',
+        example: '她的爷爷和奶奶都在中国。 (Both are in China.)'
+      },
+      {
+        char: '一起',
+        pinyin: 'yì qǐ',
+        meaning: 'Together (In company with each other)',
+        example: '昨天一起去中国了。 (Went to China together yesterday.)'
+      }
+    ];
+
+    const SENTENCE_GAME_LEVELS = [
+      {
+        id: 1,
+        target: '她的爷爷和奶奶都在中国。',
+        targetPinyin: 'Tā de yéye hé nǎinai dōu zài Zhōngguó.',
+        en: 'Her grandpa and grandma are both in China.',
+        words: ['她的', '爷爷', '和', '奶奶', '都', '在', '中国。']
+      },
+      {
+        id: 2,
+        target: '她爸爸是从中国来的。',
+        targetPinyin: 'Tā bàba shì cóng Zhōngguó lái de.',
+        en: 'Her father comes from China.',
+        words: ['她爸爸', '是', '从', '中国', '来的。']
+      },
+      {
+        id: 3,
+        target: '现在不是春节，去中国做什么？',
+        targetPinyin: 'Xiànzài bú shì chūnjié, qù Zhōngguó zuò shénme?',
+        en: 'It\'s not Spring Festival, why go to China?',
+        words: ['现在', '不是', '春节，', '去', '中国', '做什么？']
+      }
+    ];
+
+    const QUIZ_QUESTIONS = [
+      {
+        id: 1,
+        question: '北北昨天和家人一起去哪儿了？',
+        en: 'Where did Beibei go yesterday with her family?',
+        audio: '北北昨天和家人一起去哪儿了？',
+        options: ['去教室里上课', '去中国了', '去公园散步', '去动物园看熊猫'],
+        correct: 1,
+        explanation: '课文中说到：“昨天一起去中国了。”'
+      },
+      {
+        id: 2,
+        question: '北北为什么现在要去中国？',
+        en: 'Why did Beibei want to visit China now?',
+        audio: '北北为什么现在要去中国？',
+        options: ['去中国旅游看长城', '过春节吃饺子', '她爷爷生病了，想去看爷爷', '去中国买书包'],
+        correct: 2,
+        explanation: '课文中说：“她爷爷生病了，她想去看爷爷。”'
+      },
+      {
+        id: 3,
+        question: '“她爸爸是从中国来的”这句话说明了什么？',
+        en: 'What does "Her father came from China" indicate?',
+        audio: '她爸爸是从中国来的。',
+        options: ['北北爸爸是第一次听说中国', '北北爸爸的家乡故土是中国', '北北爸爸从来没去过中国', '北北爸爸现在住在教室里'],
+        correct: 1,
+        explanation: '“从……来”表示籍贯或来源地，说明北北的爸爸原籍在中国。'
+      }
+    ];
+
+    /* ==========================================================
+       2. Web Audio API Synthesis Engine (No external sound files)
+       ========================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.enabled = true;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) {
+            this.ctx = new AudioContext();
+          }
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playClick() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(600, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(800, this.ctx.currentTime + 0.05);
+          gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.05);
+        } catch(e) {}
+      }
+
+      playSuccess() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          // Play a delightful two-note chime (C6 -> E6)
+          const now = this.ctx.currentTime;
+          [ { f: 1046.5, t: 0 }, { f: 1318.5, t: 0.12 } ].forEach(note => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(note.f, now + note.t);
+            gain.gain.setValueAtTime(0.15, now + note.t);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + note.t + 0.35);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + note.t);
+            osc.stop(now + note.t + 0.35);
+          });
+        } catch(e) {}
+      }
+
+      playCheer() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          // Major arpeggio fanfare (C5, E5, G5, C6)
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          const now = this.ctx.currentTime;
+          notes.forEach((freq, i) => {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now + i * 0.09);
+            gain.gain.setValueAtTime(0.2, now + i * 0.09);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.4);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now + i * 0.09);
+            osc.stop(now + i * 0.09 + 0.45);
+          });
+        } catch(e) {}
+      }
+
+      playError() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(180, this.ctx.currentTime + 0.1);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.25);
+        } catch(e) {}
+      }
+    }
+    const sfx = new SoundEngine();
+
+    /* ==========================================================
+       3. Web Speech API (TTS) With Anti-Freeze Watchdog Dual-Scheduling
+       ========================================================== */
+    let currentSpeechRate = 0.85;
+    let selectedVoice = null;
+    let availableChineseVoices = [];
+    let isContinuousPlaying = false;
+    let continuousIndex = 0;
+    let fallbackSafetyTimer = null;
+    let activeUtterance = null;
+
+    function initSpeechEngine() {
+      if (!('speechSynthesis' in window)) {
+        showToast('当前浏览器不支持标准语音合成功能', 'alert-circle');
+        return;
+      }
+
+      const updateVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        // Priority filter: zh-CN, zh-TW, zh, or names with Chinese/Mandarin
+        availableChineseVoices = voices.filter(v => 
+          v.lang.toLowerCase().startsWith('zh') || 
+          v.lang.toLowerCase().includes('cmn') ||
+          v.name.includes('Chinese') ||
+          v.name.includes('Mandarin')
+        );
+
+        const select = document.getElementById('voice-select');
+        const voiceLabel = document.getElementById('current-voice-label');
+
+        if (availableChineseVoices.length > 0) {
+          select.innerHTML = '';
+          availableChineseVoices.forEach((v, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `${v.name} (${v.lang})`;
+            // Favor standard zh-CN voices
+            if (!selectedVoice && (v.lang === 'zh-CN' || v.name.includes('Xiaoxiao') || v.name.includes('Tingting') || v.name.includes('Google 普通话'))) {
+              selectedVoice = v;
+              opt.selected = true;
+            }
+            select.appendChild(opt);
+          });
+          if (!selectedVoice) selectedVoice = availableChineseVoices[0];
+          voiceLabel.textContent = selectedVoice.name.replace(/Microsoft |Google |Apple /g, '');
+        } else {
+          voiceLabel.textContent = '系统默认中文发音';
+        }
+      };
+
+      updateVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = updateVoices;
+      }
+    }
+
+    function changeVoice(voiceIdx) {
+      if (availableChineseVoices[voiceIdx]) {
+        selectedVoice = availableChineseVoices[voiceIdx];
+        document.getElementById('current-voice-label').textContent = selectedVoice.name.replace(/Microsoft |Google |Apple /g, '');
+        showToast(`已切换发音人: ${selectedVoice.name}`);
+        sfx.playClick();
+      }
+    }
+
+    function setSpeed(val) {
+      currentSpeechRate = parseFloat(val);
+      document.querySelectorAll('.speed-btn').forEach(btn => {
+        if (parseFloat(btn.dataset.speed) === currentSpeechRate) {
+          btn.className = 'speed-btn px-2 py-0.5 rounded-md bg-sky-500 text-white font-bold';
+        } else {
+          btn.className = 'speed-btn px-2 py-0.5 rounded-md text-slate-600 hover:bg-slate-100 font-semibold';
+        }
+      });
+      sfx.playClick();
+      showToast(`语速已调至 ${currentSpeechRate}x`);
+    }
+
+    /**
+     * Absolute Anti-Freeze Speech Synthesis with Dual-Safety Watchdog:
+     * Dispatches `utterance.onend` simultaneously guarded with an estimated dynamic
+     * timeout to guarantee 100% reliable transition to subsequent sentences.
+     */
+    function speakText(text, onFinished = null) {
+      if (!('speechSynthesis' in window)) {
+        if (onFinished) onFinished();
+        return;
+      }
+
+      // Clear any pending timers and previous synthesis
+      if (fallbackSafetyTimer) {
+        clearTimeout(fallbackSafetyTimer);
+        fallbackSafetyTimer = null;
+      }
+      window.speechSynthesis.cancel();
+
+      if (!text || text.trim() === '') {
+        if (onFinished) onFinished();
+        return;
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      activeUtterance = utterance;
+      utterance.lang = 'zh-CN';
+      utterance.rate = currentSpeechRate;
+
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      let hasCompleted = false;
+
+      // Safe completion handler
+      const finalize = () => {
+        if (hasCompleted) return;
+        hasCompleted = true;
+        if (fallbackSafetyTimer) {
+          clearTimeout(fallbackSafetyTimer);
+          fallbackSafetyTimer = null;
+        }
+        activeUtterance = null;
+        if (onFinished) onFinished();
+      };
+
+      utterance.onend = () => {
+        finalize();
+      };
+
+      utterance.onerror = (err) => {
+        console.warn('SpeechSynthesis error or canceled:', err);
+        finalize();
+      };
+
+      // Watchdog Timer Calculation:
+      // Normal reading is ~3.2 characters/sec at rate 1.0. We add safety padding.
+      const charCount = text.length;
+      const calculatedDurationSec = (charCount / (2.8 * currentSpeechRate)) + 1.2;
+      const watchdogTimeoutMs = Math.max(1400, calculatedDurationSec * 1000);
+
+      fallbackSafetyTimer = setTimeout(() => {
+        console.info(`[Watchdog] Utterance auto-recovered after ${watchdogTimeoutMs.toFixed(0)}ms`);
+        finalize();
+      }, watchdogTimeoutMs);
+
+      // Trigger speech
+      window.speechSynthesis.speak(utterance);
+    }
+
+    /* ==========================================================
+       4. Continuous Playback (全文连读)
+       ========================================================== */
+    function startContinuousPlay() {
+      sfx.playClick();
+      isContinuousPlaying = true;
+      continuousIndex = 0;
+      updatePlayControlsUI(true);
+      playNextContinuousLine();
+    }
+
+    function stopContinuousPlay() {
+      sfx.playClick();
+      isContinuousPlaying = false;
+      if (fallbackSafetyTimer) {
+        clearTimeout(fallbackSafetyTimer);
+        fallbackSafetyTimer = null;
+      }
+      window.speechSynthesis.cancel();
+      clearHighlightCards();
+      updatePlayControlsUI(false);
+    }
+
+    function playNextContinuousLine() {
+      if (!isContinuousPlaying) return;
+
+      if (continuousIndex >= DIALOGUE_DATA.length) {
+        // Complete full read
+        isContinuousPlaying = false;
+        updatePlayControlsUI(false);
+        clearHighlightCards();
+        sfx.playSuccess();
+        showToast('🎉 全文朗读完毕！');
+        return;
+      }
+
+      const line = DIALOGUE_DATA[continuousIndex];
+      highlightCard(line.id);
+
+      // Speak with safe callback
+      speakText(line.text, () => {
+        if (!isContinuousPlaying) return;
+        continuousIndex++;
+        // Gentle breathing gap between conversation turns (400ms)
+        setTimeout(() => {
+          playNextContinuousLine();
+        }, 400);
+      });
+    }
+
+    function updatePlayControlsUI(isPlaying) {
+      const playBtn = document.getElementById('play-all-btn');
+      const indicator = document.getElementById('playing-indicator');
+      if (isPlaying) {
+        indicator.classList.remove('hidden');
+        playBtn.classList.add('ring-2', 'ring-white');
+        playBtn.innerHTML = `<i data-lucide="pause" class="w-4 h-4 fill-current"></i><span>连读中...</span>`;
+      } else {
+        indicator.classList.add('hidden');
+        playBtn.classList.remove('ring-2', 'ring-white');
+        playBtn.innerHTML = `<i data-lucide="play" class="w-4 h-4 fill-current"></i><span>全文朗读</span>`;
+      }
+      lucide.createIcons();
+    }
+
+    function highlightCard(lineId) {
+      clearHighlightCards();
+      const card = document.getElementById(`dialogue-card-${lineId}`);
+      if (card) {
+        card.classList.add('speaking-card');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function clearHighlightCards() {
+      document.querySelectorAll('.speaking-card').forEach(el => {
+        el.classList.remove('speaking-card');
+      });
+    }
+
+    function playSingleSentence(lineId) {
+      if (isContinuousPlaying) {
+        stopContinuousPlay();
+      }
+      sfx.playClick();
+      const line = DIALOGUE_DATA.find(d => d.id === lineId);
+      if (!line) return;
+      highlightCard(lineId);
+      speakText(line.text, () => {
+        clearHighlightCards();
+      });
+    }
+
+    /* ==========================================================
+       5. Interactive Dialogue UI Construction
+       ========================================================== */
+    function renderDialogueCards() {
+      const container = document.getElementById('dialogue-container');
+      container.innerHTML = '';
+
+      DIALOGUE_DATA.forEach(item => {
+        const isYang = item.speaker === 'yangyang';
+        const cardBg = isYang ? 'bg-sky-50/70 border-sky-200/80' : 'bg-rose-50/70 border-rose-200/80';
+        const badgeBg = isYang ? 'bg-sky-100 text-sky-800' : 'bg-rose-100 text-rose-800';
+
+        // Build tokens with ruby for Pinyin
+        const tokensHtml = item.tokens.map(token => {
+          if (token.punct) {
+            return `<span class="inline-block text-slate-800 font-bold mx-0.5 text-lg sm:text-xl align-bottom">${token.hanzi}</span>`;
+          }
+          if (token.key) {
+            return `
+              <span class="vocab-token bg-amber-100/90 hover:bg-amber-200 text-amber-950 font-black cursor-pointer inline-block"
+                    onclick="openVocabDetail('${token.hanzi}')" title="点击查看释义">
+                <ruby>
+                  <span class="text-base sm:text-xl">${token.hanzi}</span>
+                  <rt class="text-amber-800">${token.pinyin}</rt>
+                </ruby>
+              </span>
+            `;
+          }
+          return `
+            <ruby class="text-slate-900 font-semibold cursor-pointer" onclick="speakText('${token.hanzi}')" title="点击朗读单字">
+              <span class="text-base sm:text-xl">${token.hanzi}</span>
+              <rt>${token.pinyin}</rt>
+            </ruby>
+          `;
+        }).join('');
+
+        const card = document.createElement('div');
+        card.id = `dialogue-card-${item.id}`;
+        card.className = `p-4 sm:p-5 rounded-2xl border ${cardBg} shadow-sm transition-all duration-200 relative group flex gap-3 sm:gap-4 items-start`;
+
+        card.innerHTML = `
+          <!-- Avatar Icon -->
+          <div class="flex flex-col items-center shrink-0">
+            <div class="w-12 h-12 rounded-2xl ${isYang ? 'bg-sky-200/90 text-sky-800' : 'bg-rose-200/90 text-rose-800'} flex items-center justify-center text-2xl shadow-inner border border-white">
+              ${item.avatar}
+            </div>
+            <span class="text-[11px] font-bold mt-1 px-1.5 py-0.5 rounded-full ${badgeBg}">${item.speakerName}</span>
+          </div>
+
+          <!-- Speech Content Area -->
+          <div class="flex-1 min-w-0">
+            <!-- Chinese with Pinyin -->
+            <div class="pinyin-sentence flex flex-wrap items-end gap-y-1.5 leading-relaxed">
+              ${tokensHtml}
+            </div>
+
+            <!-- English Translation -->
+            <div class="english-text mt-2 text-xs sm:text-sm text-slate-600 font-medium border-t border-slate-200/60 pt-2 flex items-start gap-1.5">
+              <span class="text-slate-400 font-bold shrink-0">En:</span>
+              <span>${item.english}</span>
+            </div>
+          </div>
+
+          <!-- Sentence Quick Action Buttons -->
+          <div class="flex flex-col gap-1.5 shrink-0 self-center">
+            <button onclick="playSingleSentence(${item.id})" 
+              class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-sky-600 hover:bg-sky-50 hover:border-sky-300 shadow-sm active:scale-90 transition flex items-center justify-center"
+              title="朗读此句">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
+            </button>
+            <button onclick="practiceRecording(${item.id})" 
+              class="w-9 h-9 rounded-xl bg-white border border-slate-200 text-rose-600 hover:bg-rose-50 hover:border-rose-300 shadow-sm active:scale-90 transition flex items-center justify-center"
+              title="跟读模拟练习">
+              <i data-lucide="mic" class="w-4 h-4"></i>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    /* ==========================================================
+       6. Role-Play Engine (分角色演练)
+       ========================================================== */
+    let selectedRole = 'yangyang'; // 'yangyang' or 'xiaoxi'
+    let roleplayCurrentIndex = 0;
+    let isRoleplayRunning = false;
+
+    function selectRole(role) {
+      sfx.playClick();
+      selectedRole = role;
+      const yangBtn = document.getElementById('pick-yangyang-btn');
+      const xiaoxiBtn = document.getElementById('pick-xiaoxi-btn');
+
+      if (role === 'yangyang') {
+        yangBtn.className = 'role-select-btn px-4 py-2 rounded-xl border-2 border-sky-400 bg-sky-50 font-bold text-sm text-sky-800 flex items-center gap-2 shadow-sm transition';
+        xiaoxiBtn.className = 'role-select-btn px-4 py-2 rounded-xl border-2 border-slate-200 bg-white font-bold text-sm text-slate-600 hover:bg-rose-50 flex items-center gap-2 shadow-sm transition';
+        showToast('你已选择扮演: 阳阳 👦');
+      } else {
+        xiaoxiBtn.className = 'role-select-btn px-4 py-2 rounded-xl border-2 border-rose-400 bg-rose-50 font-bold text-sm text-rose-800 flex items-center gap-2 shadow-sm transition';
+        yangBtn.className = 'role-select-btn px-4 py-2 rounded-xl border-2 border-slate-200 bg-white font-bold text-sm text-slate-600 hover:bg-sky-50 flex items-center gap-2 shadow-sm transition';
+        showToast('你已选择扮演: 小西 👧');
+      }
+      renderRoleplayLinesList();
+    }
+
+    function renderRoleplayLinesList() {
+      const container = document.getElementById('roleplay-lines-list');
+      container.innerHTML = '';
+
+      DIALOGUE_DATA.forEach((line, idx) => {
+        const isUserTurn = line.speaker === selectedRole;
+        const div = document.createElement('div');
+        div.id = `roleplay-line-${idx}`;
+        div.className = `p-4 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 ${
+          isUserTurn 
+            ? 'bg-amber-50/70 border-amber-200 text-amber-950 font-semibold' 
+            : 'bg-white border-slate-200 text-slate-700'
+        }`;
+
+        div.innerHTML = `
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shadow-sm ${
+              isUserTurn ? 'bg-amber-400 text-white' : 'bg-slate-100 text-slate-600'
+            }">
+              ${line.avatar}
+            </span>
+            <div>
+              <div class="text-xs font-bold ${isUserTurn ? 'text-amber-700' : 'text-slate-400'}">
+                ${line.speakerName} (${line.speakerEn}) ${isUserTurn ? '★ [你的台词]' : '[电脑朗读]'}
+              </div>
+              <div class="text-sm sm:text-base font-bold mt-0.5">${line.text}</div>
+            </div>
+          </div>
+          <button onclick="speakText('${line.text}')" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 transition">
+            <i data-lucide="volume-2" class="w-4 h-4"></i>
+          </button>
+        `;
+        container.appendChild(div);
+      });
+      lucide.createIcons();
+    }
+
+    function startRoleplayDialogue() {
+      sfx.playClick();
+      isRoleplayRunning = true;
+      roleplayCurrentIndex = 0;
+      document.getElementById('roleplay-start-btn').classList.add('hidden');
+      stepThroughRoleplay();
+    }
+
+    function stepThroughRoleplay() {
+      if (!isRoleplayRunning) return;
+
+      if (roleplayCurrentIndex >= DIALOGUE_DATA.length) {
+        // Complete
+        isRoleplayRunning = false;
+        document.getElementById('roleplay-step-badge').textContent = '🎉 演练全部完成！';
+        document.getElementById('roleplay-step-badge').className = 'text-xs font-bold px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full mb-3';
+        document.getElementById('roleplay-instruction').textContent = '太棒了！你完美完成了角色扮演对话！';
+        document.getElementById('roleplay-subtext').textContent = '可随时更换角色再来一次！';
+        document.getElementById('roleplay-avatar-prompt').textContent = '🏆';
+        document.getElementById('roleplay-start-btn').classList.remove('hidden');
+        document.getElementById('roleplay-start-btn').textContent = '再次演练';
+        document.getElementById('roleplay-user-done-btn').classList.add('hidden');
+        sfx.playCheer();
+        triggerConfetti();
+        return;
+      }
+
+      const line = DIALOGUE_DATA[roleplayCurrentIndex];
+      const isUserTurn = line.speaker === selectedRole;
+
+      // Highlight target row in the list
+      document.querySelectorAll('#roleplay-lines-list > div').forEach((el, i) => {
+        if (i === roleplayCurrentIndex) {
+          el.classList.add('ring-2', 'ring-indigo-500', 'bg-indigo-50/80');
+          el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        } else {
+          el.classList.remove('ring-2', 'ring-indigo-500', 'bg-indigo-50/80');
+        }
+      });
+
+      if (!isUserTurn) {
+        // AI Partner Turn
+        document.getElementById('roleplay-step-badge').textContent = `第 ${roleplayCurrentIndex + 1}/6 句 · 听电脑说...`;
+        document.getElementById('roleplay-step-badge').className = 'text-xs font-bold px-3 py-1 bg-sky-100 text-sky-700 rounded-full mb-3';
+        document.getElementById('roleplay-avatar-prompt').textContent = line.avatar;
+        document.getElementById('roleplay-instruction').textContent = `请倾听 ${line.speakerName}：“${line.text}”`;
+        document.getElementById('roleplay-subtext').textContent = '电脑发音中，请仔细听发音与语调...';
+        document.getElementById('roleplay-user-done-btn').classList.add('hidden');
+
+        speakText(line.text, () => {
+          if (!isRoleplayRunning) return;
+          roleplayCurrentIndex++;
+          setTimeout(() => {
+            stepThroughRoleplay();
+          }, 600);
+        });
+      } else {
+        // User's Turn
+        sfx.playSuccess();
+        document.getElementById('roleplay-step-badge').textContent = `第 ${roleplayCurrentIndex + 1}/6 句 · 轮到你说了！`;
+        document.getElementById('roleplay-step-badge').className = 'text-xs font-bold px-3 py-1 bg-amber-100 text-amber-800 rounded-full mb-3 animate-pulse';
+        document.getElementById('roleplay-avatar-prompt').textContent = line.avatar;
+        document.getElementById('roleplay-instruction').textContent = `该你读了：“${line.text}”`;
+        document.getElementById('roleplay-subtext').textContent = `英译参考: ${line.english}`;
+        document.getElementById('roleplay-user-done-btn').classList.remove('hidden');
+      }
+    }
+
+    function finishUserTurn() {
+      sfx.playSuccess();
+      roleplayCurrentIndex++;
+      stepThroughRoleplay();
+    }
+
+    /* ==========================================================
+       7. Vocabulary Flashcards Module
+       ========================================================== */
+    function renderVocabCards() {
+      const grid = document.getElementById('vocab-cards-grid');
+      grid.innerHTML = '';
+
+      VOCAB_DATABASE.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm hover:shadow-md hover:border-amber-300 transition-all cursor-pointer group flex flex-col justify-between';
+        card.onclick = () => openVocabDetail(item.char);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">${item.pinyin}</span>
+              <button onclick="event.stopPropagation(); speakText('${item.char}')" 
+                class="w-7 h-7 rounded-lg bg-slate-100 hover:bg-sky-100 hover:text-sky-600 flex items-center justify-center transition">
+                <i data-lucide="volume-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+            <div class="text-xl font-black text-slate-800 mt-2 tracking-tight group-hover:text-amber-600 transition">${item.char}</div>
+            <div class="text-xs font-medium text-slate-500 mt-1 line-clamp-2">${item.meaning}</div>
+          </div>
+          <div class="mt-3 pt-2 border-t border-slate-100 text-[11px] text-slate-400 flex items-center justify-between">
+            <span>点击查看详解与例句</span>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-slate-300 group-hover:translate-x-1 transition"></i>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    let activeModalWord = null;
+    function openVocabDetail(charKey) {
+      sfx.playClick();
+      const wordObj = VOCAB_DATABASE.find(v => v.char === charKey || charKey.includes(v.char.replace('……', '')));
+      if (!wordObj) {
+        speakText(charKey);
+        return;
+      }
+      activeModalWord = wordObj;
+
+      document.getElementById('modal-char-avatar').textContent = wordObj.char.slice(0, 1);
+      document.getElementById('modal-word-title').textContent = wordObj.char;
+      document.getElementById('modal-word-pinyin').textContent = wordObj.pinyin;
+      document.getElementById('modal-word-meaning').textContent = wordObj.meaning;
+      document.getElementById('modal-word-example').textContent = wordObj.example;
+
+      const modal = document.getElementById('vocab-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      lucide.createIcons();
+    }
+
+    function closeVocabModal() {
+      sfx.playClick();
+      const modal = document.getElementById('vocab-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function speakModalWord() {
+      if (activeModalWord) {
+        speakText(activeModalWord.char);
+      }
+    }
+
+    /* ==========================================================
+       8. Game 1: 连词成句 (Sentence Scramble)
+       ========================================================== */
+    let currentLevelIndex = 0;
+    let currentScrambleAnswer = [];
+
+    function initSentenceGame() {
+      currentScrambleAnswer = [];
+      const currentLevel = SENTENCE_GAME_LEVELS[currentLevelIndex];
+      document.getElementById('scramble-score-tag').textContent = `关卡 ${currentLevelIndex + 1}/${SENTENCE_GAME_LEVELS.length}`;
+      document.getElementById('scramble-hint-target').textContent = `释义: ${currentLevel.en}`;
+
+      // Shuffle word bank
+      const shuffled = [...currentLevel.words].sort(() => Math.random() - 0.5);
+
+      const wordbank = document.getElementById('sentence-wordbank');
+      wordbank.innerHTML = '';
+      shuffled.forEach((word, idx) => {
+        const btn = document.createElement('button');
+        btn.id = `scramble-word-${idx}`;
+        btn.className = 'px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-slate-800 font-bold text-sm hover:border-sky-400 hover:bg-sky-50 active:scale-95 transition';
+        btn.textContent = word;
+        btn.onclick = () => selectWordBlock(word, btn);
+        wordbank.appendChild(btn);
+      });
+
+      renderDropzone();
+    }
+
+    function selectWordBlock(word, btnElement) {
+      sfx.playClick();
+      currentScrambleAnswer.push(word);
+      btnElement.classList.add('opacity-30', 'pointer-events-none');
+      renderDropzone();
+      // Auto speak tapped word
+      speakText(word);
+    }
+
+    function removeWordBlock(idx) {
+      sfx.playClick();
+      const removed = currentScrambleAnswer.splice(idx, 1)[0];
+      // Restore button in wordbank
+      const buttons = document.querySelectorAll('#sentence-wordbank button');
+      for (let btn of buttons) {
+        if (btn.textContent === removed && btn.classList.contains('opacity-30')) {
+          btn.classList.remove('opacity-30', 'pointer-events-none');
+          break;
+        }
+      }
+      renderDropzone();
+    }
+
+    function renderDropzone() {
+      const dropzone = document.getElementById('sentence-dropzone');
+      dropzone.innerHTML = '';
+
+      if (currentScrambleAnswer.length === 0) {
+        dropzone.innerHTML = '<span id="dropzone-empty-tip" class="text-xs text-slate-400 italic">点击词块填入这里...</span>';
+        return;
+      }
+
+      currentScrambleAnswer.forEach((w, i) => {
+        const tag = document.createElement('span');
+        tag.className = 'px-3 py-1.5 rounded-lg bg-sky-500 text-white font-bold text-sm shadow-sm flex items-center gap-1 cursor-pointer hover:bg-rose-500 transition';
+        tag.innerHTML = `${w} <i data-lucide="x" class="w-3 h-3"></i>`;
+        tag.onclick = () => removeWordBlock(i);
+        dropzone.appendChild(tag);
+      });
+      lucide.createIcons();
+    }
+
+    function clearCurrentAnswer() {
+      sfx.playClick();
+      currentScrambleAnswer = [];
+      document.querySelectorAll('#sentence-wordbank button').forEach(b => {
+        b.classList.remove('opacity-30', 'pointer-events-none');
+      });
+      renderDropzone();
+    }
+
+    function checkSentenceAnswer() {
+      const userSentence = currentScrambleAnswer.join('');
+      const target = SENTENCE_GAME_LEVELS[currentLevelIndex].target;
+
+      if (userSentence === target) {
+        sfx.playSuccess();
+        triggerConfetti();
+        showToast('🎯 太棒了！回答完全正确！');
+
+        setTimeout(() => {
+          if (currentLevelIndex < SENTENCE_GAME_LEVELS.length - 1) {
+            currentLevelIndex++;
+            initSentenceGame();
+          } else {
+            sfx.playCheer();
+            showToast('🏆 恭喜！连词成句全部关卡通过！');
+            currentLevelIndex = 0;
+            initSentenceGame();
+          }
+        }, 1200);
+      } else {
+        sfx.playError();
+        showToast('还差一点点，调整词序再试一次吧！', 'alert-circle');
+      }
+    }
+
+    /* ==========================================================
+       9. Game 2: 课文理解与听力选择题 (Comprehension Quiz)
+       ========================================================== */
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      QUIZ_QUESTIONS.forEach((q, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-xl border border-slate-200 bg-slate-50/50 flex flex-col gap-3';
+
+        const optionsHtml = q.options.map((opt, oIdx) => `
+          <button onclick="handleQuizAnswer(${qIdx}, ${oIdx}, this)" 
+            class="quiz-option-btn w-full text-left p-3 rounded-xl border border-slate-200 bg-white hover:border-sky-300 hover:bg-sky-50 text-slate-800 text-xs sm:text-sm font-semibold transition active:scale-98 flex items-center justify-between">
+            <span>${String.fromCharCode(65 + oIdx)}. ${opt}</span>
+            <span class="quiz-feedback-icon hidden"></span>
+          </button>
+        `).join('');
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="text-sm sm:text-base font-bold text-slate-900">${qIdx + 1}. ${q.question}</div>
+              <div class="text-xs text-slate-400 font-medium">${q.en}</div>
+            </div>
+            <button onclick="speakText('${q.audio}')" 
+              class="p-2 rounded-xl bg-white border border-slate-200 text-sky-600 hover:bg-sky-50 shrink-0" title="朗读题干">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="space-y-2 mt-1">
+            ${optionsHtml}
+          </div>
+
+          <div id="quiz-explain-${qIdx}" class="hidden text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl font-medium">
+            💡 解析：${q.explanation}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function handleQuizAnswer(qIdx, optionIdx, btnElement) {
+      const q = QUIZ_QUESTIONS[qIdx];
+      const parent = btnElement.parentElement;
+      const buttons = parent.querySelectorAll('.quiz-option-btn');
+      const explainEl = document.getElementById(`quiz-explain-${qIdx}`);
+
+      // Disable further clicks on this question
+      buttons.forEach(b => b.classList.add('pointer-events-none'));
+
+      if (optionIdx === q.correct) {
+        sfx.playSuccess();
+        triggerConfetti();
+        btnElement.classList.remove('bg-white', 'border-slate-200');
+        btnElement.classList.add('bg-emerald-500', 'text-white', 'border-emerald-600', 'font-bold');
+        explainEl.classList.remove('hidden');
+        showToast('回答正确！加10分！🌟');
+      } else {
+        sfx.playError();
+        btnElement.classList.remove('bg-white', 'border-slate-200');
+        btnElement.classList.add('bg-rose-500', 'text-white', 'border-rose-600');
+        // Highlight correct one
+        buttons[q.correct].classList.add('bg-emerald-100', 'border-emerald-400', 'text-emerald-900');
+        explainEl.classList.remove('hidden');
+        showToast('答错啦，请看解析！', 'alert-circle');
+      }
+    }
+
+    /* ==========================================================
+       10. Global UI Utilities & Speech Practice Simulator
+       ========================================================== */
+    function practiceRecording(lineId) {
+      sfx.playClick();
+      const line = DIALOGUE_DATA.find(d => d.id === lineId);
+      if (!line) return;
+
+      // Check if browser SpeechRecognition is available
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        try {
+          const rec = new SpeechRecognition();
+          rec.lang = 'zh-CN';
+          rec.continuous = false;
+          rec.interimResults = false;
+
+          showToast('🎙️ 请对着麦克风大声朗读此句...', 'mic');
+
+          rec.onresult = (evt) => {
+            const transcript = evt.results[0][0].transcript;
+            showToast(`识别到: “${transcript}”`, 'check');
+            sfx.playSuccess();
+            triggerConfetti();
+          };
+
+          rec.onerror = () => {
+            // Graceful fallback to practice imitation
+            showToast('🎙️ 录音练习完毕，发音很棒！', 'check');
+            sfx.playSuccess();
+          };
+
+          rec.start();
+        } catch(e) {
+          showToast('🎙️ 录音练习完毕，发音很棒！', 'check');
+          sfx.playSuccess();
+        }
+      } else {
+        // Fallback simulation
+        showToast(`🎙️ 跟读模仿: “${line.text}” 很好！`, 'check');
+        sfx.playSuccess();
+      }
+    }
+
+    function togglePinyin() {
+      sfx.playClick();
+      document.body.classList.toggle('hide-pinyin');
+      const isHidden = document.body.classList.contains('hide-pinyin');
+      document.getElementById('pinyin-status-text').textContent = isHidden ? '拼音: 关' : '拼音: 开';
+      showToast(isHidden ? '已隐藏拼音' : '已显示拼音');
+    }
+
+    function toggleEnglish() {
+      sfx.playClick();
+      document.body.classList.toggle('hide-english');
+      const isHidden = document.body.classList.contains('hide-english');
+      document.getElementById('english-status-text').textContent = isHidden ? '英文: 关' : '英文: 开';
+      showToast(isHidden ? '已隐藏英文翻译' : '已显示英文翻译');
+    }
+
+    function toggleSFX() {
+      sfx.enabled = !sfx.enabled;
+      const icon = document.getElementById('sfx-icon');
+      if (sfx.enabled) {
+        icon.setAttribute('data-lucide', 'volume-2');
+        icon.className = 'w-4 h-4 text-emerald-600';
+        showToast('音效已开启');
+      } else {
+        icon.setAttribute('data-lucide', 'volume-x');
+        icon.className = 'w-4 h-4 text-slate-400';
+        showToast('音效已静音');
+      }
+      lucide.createIcons();
+    }
+
+    function switchTab(tabKey) {
+      sfx.playClick();
+      if (isContinuousPlaying) stopContinuousPlay();
+
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.className = 'tab-btn px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:bg-sky-50 transition shrink-0';
+      });
+
+      document.getElementById(`tab-content-${tabKey}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tab-btn-${tabKey}`);
+      activeBtn.className = 'tab-btn active px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 bg-sky-600 text-white shadow-sm shadow-sky-200 transition shrink-0';
+    }
+
+    function showToast(msg, icon = 'info') {
+      const toastBox = document.getElementById('toast-box');
+      const msgEl = document.getElementById('toast-message');
+      const iconEl = document.getElementById('toast-icon');
+
+      msgEl.textContent = msg;
+      iconEl.setAttribute('data-lucide', icon);
+      lucide.createIcons();
+
+      toastBox.classList.remove('opacity-0', 'translate-y-3');
+      toastBox.classList.add('opacity-100', 'translate-y-0');
+
+      clearTimeout(toastBox._timer);
+      toastBox._timer = setTimeout(() => {
+        toastBox.classList.remove('opacity-100', 'translate-y-0');
+        toastBox.classList.add('opacity-0', 'translate-y-3');
+      }, 2200);
+    }
+
+    function triggerConfetti() {
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { y: 0.75 }
+        });
+      }
+    }
+
+    /* ==========================================================
+       11. App Bootstrap
+       ========================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      // 1. Render all UI modules
+      renderDialogueCards();
+      renderRoleplayLinesList();
+      renderVocabCards();
+      initSentenceGame();
+      renderQuiz();
+
+      // 2. Init TTS
+      initSpeechEngine();
+
+      // 3. Lucide icons
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>

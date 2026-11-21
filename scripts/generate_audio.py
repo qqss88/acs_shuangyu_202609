@@ -2,7 +2,7 @@
 # requires-python = ">=3.10"
 # dependencies = ["sherpa-onnx>=1.12", "soundfile", "lameenc", "numpy"]
 # ///
-"""Pre-generate Mandarin audio clips for index.html with Kokoro v1.1-zh (sherpa-onnx).
+"""Pre-generate Mandarin audio clips for lessons/lesson3.html with Kokoro v1.1-zh (sherpa-onnx).
 
 Usage:
     uv run scripts/generate_audio.py --model-dir path/to/kokoro-multi-lang-v1_1
@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-HTML_PATH = ROOT / "index.html"
+HTML_PATH = ROOT / "lessons" / "lesson3.html"
 AUDIO_DIR = ROOT / "audio"
 CLIP_DIR = AUDIO_DIR / "kokoro"
 MANIFEST_PATH = AUDIO_DIR / "manifest.js"

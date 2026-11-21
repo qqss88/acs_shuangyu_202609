@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>第六课：妈妈送给我的礼物 | 交互式中文学习课件</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://unpkg.com/lucide@0.460.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+    :root {
+      --bg-warm: #FFFBF2;
+      --card-bg: #FFFFFF;
+      --primary: #FF6B6B;
+      --secondary: #4ECDC4;
+      --accent: #FFE66D;
+      --ink: #1E293B;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+      background-color: var(--bg-warm);
+      color: var(--ink);
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+
+    .font-zh {
+      font-family: 'Noto Sans SC', "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    }
+
+    /* Karaoke character styling */
+    .char-token {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 2px 3px;
+      margin: 1px 1px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+      user-select: none;
+    }
+
+    .char-token:hover {
+      background-color: #FEF3C7;
+      transform: translateY(-1px);
+    }
+
+    .char-token.karaoke-active {
+      background-color: #FDE047;
+      color: #9A3412;
+      transform: scale(1.08);
+      box-shadow: 0 2px 6px rgba(234, 179, 8, 0.35);
+    }
+
+    .char-token.karaoke-passed {
+      background-color: #FEF9C3;
+      color: #854D0E;
+    }
+
+    .punct-token {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 2px 1px;
+      user-select: none;
+    }
+
+    .sentence-active {
+      box-shadow: 0 0 0 3px #F59E0B, 0 10px 25px -5px rgba(245, 158, 11, 0.25);
+      background-color: #FFFBEB !important;
+    }
+
+    /* 3D Flashcard */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+
+    .flip-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.55s cubic-bezier(0.4, 0.2, 0.2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flip-card-inner.is-flipped {
+      transform: rotateY(180deg);
+    }
+
+    .flip-card-front, .flip-card-back {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .flip-card-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Memory Match Card */
+    .mem-card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.4s ease;
+      transform-style: preserve-3d;
+    }
+
+    .mem-card-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .mem-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .mem-back {
+      transform: rotateY(180deg);
+    }
+
+    /* Mascot Animations */
+    @keyframes chewAnim {
+      0%, 100% { transform: scale(1) translateY(0); }
+      25% { transform: scale(1.06, 0.94) translateY(3px); }
+      50% { transform: scale(0.96, 1.05) translateY(-4px); }
+      75% { transform: scale(1.04, 0.96) translateY(2px); }
+    }
+
+    @keyframes shakeHeadAnim {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      20% { transform: translateX(-8px) rotate(-6deg); }
+      40% { transform: translateX(8px) rotate(6deg); }
+      60% { transform: translateX(-6px) rotate(-4deg); }
+      80% { transform: translateX(6px) rotate(4deg); }
+    }
+
+    .animate-chew {
+      animation: chewAnim 0.45s ease-in-out 2;
+    }
+
+    .animate-shake {
+      animation: shakeHeadAnim 0.45s ease-in-out;
+    }
+
+    /* Whack-a-mole */
+    .mole-hole {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mole-actor {
+      transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform: translateY(115%);
+    }
+
+    .mole-actor.up {
+      transform: translateY(0%);
+    }
+
+    .mole-actor.whacked {
+      transform: translateY(15%) scale(0.9);
+    }
+
+    /* Hide scrollbar for horizontal nav on small screens */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <a href="../index.html" class="home-backlink" aria-label="返回首页 Back to home" style="position:fixed;left:12px;bottom:12px;z-index:45;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(31,27,22,.82);color:#fff;font:600 14px/1.2 -apple-system,BlinkMacSystemFont,'PingFang SC',sans-serif;text-decoration:none;box-shadow:0 6px 16px -6px rgba(0,0,0,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)">← 返回首页</a>
+
+  <!-- Top Header -->
+  <header class="bg-gradient-to-r from-sky-500 via-indigo-500 to-purple-500 text-white shadow-md">
+    <div class="max-w-5xl mx-auto px-4 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center text-2xl shadow-inner">
+          🎁
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider bg-amber-300 text-amber-950 px-2 py-0.5 rounded-full">Lesson 6</span>
+            <span class="text-xs text-sky-100 hidden sm:inline">交互式双语中文课件</span>
+          </div>
+          <h1 class="text-lg sm:text-2xl font-extrabold font-zh tracking-tight leading-tight">
+            第六课：妈妈送给我的礼物
+          </h1>
+          <p class="text-xs sm:text-sm text-sky-100 font-medium">Mom gave me a present</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-sound-toggle" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition text-xs sm:text-sm font-semibold min-h-[40px]" title="切换音效">
+          <i data-lucide="volume-2" class="w-4 h-4"></i>
+          <span id="sound-label">音效开</span>
+        </button>
+        <div class="hidden sm:flex items-center gap-1.5 bg-white/15 px-3 py-2 rounded-xl text-xs font-semibold">
+          <span>🏆 积分:</span>
+          <span id="global-score" class="text-amber-300 font-extrabold text-sm">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-black/10 backdrop-blur-sm border-t border-white/10">
+      <div class="max-w-5xl mx-auto px-3 flex items-center gap-1.5 overflow-x-auto no-scrollbar py-2">
+        <button data-tab="reader" class="nav-tab active-tab flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition min-h-[42px] bg-white text-indigo-700 shadow">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>课文点读</span>
+        </button>
+        <button data-tab="flashcards" class="nav-tab flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition min-h-[42px] text-white/90 hover:bg-white/15">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>生字抽认卡</span>
+        </button>
+        <button data-tab="games" class="nav-tab flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition min-h-[42px] text-white/90 hover:bg-white/15">
+          <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+          <span>互动游戏矩阵</span>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Floating Character Tooltip -->
+  <div id="char-tooltip" class="fixed z-50 pointer-events-none opacity-0 transition-opacity duration-150 bg-slate-900 text-white px-3.5 py-2 rounded-xl shadow-xl flex items-center gap-2.5 text-sm">
+    <span id="tooltip-char" class="text-xl font-bold font-zh text-amber-300"></span>
+    <span id="tooltip-pinyin" class="font-semibold text-sky-200"></span>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-5 py-5">
+
+    <!-- ==================== TAB 1: INTERACTIVE READER ==================== -->
+    <section id="tab-reader" class="space-y-4">
+      <!-- Sticky Reader Toolbar -->
+      <div class="sticky top-2 z-30 bg-white/95 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-lg p-3 sm:p-4 flex flex-wrap items-center justify-between gap-3">
+        <!-- Playback Controls -->
+        <div class="flex items-center gap-2">
+          <button id="btn-play-all" class="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white font-bold text-sm shadow-sm transition min-h-[44px]">
+            <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+            <span>全文连读</span>
+          </button>
+          <button id="btn-pause-all" class="hidden items-center gap-1.5 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white font-bold text-sm shadow-sm transition min-h-[44px]">
+            <i data-lucide="pause" class="w-4 h-4 fill-current"></i>
+            <span>暂停</span>
+          </button>
+          <button id="btn-stop-all" class="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-bold text-sm transition min-h-[44px]">
+            <i data-lucide="square" class="w-4 h-4 fill-current"></i>
+            <span>停止</span>
+          </button>
+        </div>
+
+        <!-- Speed Control -->
+        <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl">
+          <span class="text-xs font-bold text-slate-500 px-2 hidden sm:inline">语速</span>
+          <button data-rate="0.3" class="rate-btn px-2.5 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-white">0.3x</button>
+          <button data-rate="0.5" class="rate-btn px-2.5 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-white">0.5x</button>
+          <button data-rate="0.7" class="rate-btn px-2.5 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-white">0.7x</button>
+          <button data-rate="0.85" class="rate-btn active-rate px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-indigo-600 text-white shadow-sm">0.85x</button>
+          <button data-rate="1.0" class="rate-btn px-2.5 py-1.5 rounded-lg text-xs font-bold transition text-slate-600 hover:bg-white">1.0x</button>
+        </div>
+
+        <!-- Display Toggles -->
+        <div class="flex items-center gap-2">
+          <button id="toggle-pinyin" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-indigo-500 bg-indigo-50 text-indigo-700 transition min-h-[42px]">
+            <span>拼音 ON</span>
+          </button>
+          <button id="toggle-english" class="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold border-2 border-sky-500 bg-sky-50 text-sky-700 transition min-h-[42px]">
+            <span>英文 ON</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tip Banner -->
+      <div class="bg-amber-50 border border-amber-200 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-amber-900 flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="text-base">💡</span>
+          <span>点击任意<strong>单个汉字</strong>可单独发音；点击每句旁的 <strong>🔊</strong> 可只读该句；点击<strong>全文连读</strong>体验卡拉OK同步高亮。</span>
+        </div>
+        <span id="voice-status" class="text-xs font-semibold text-amber-700 hidden md:inline"></span>
+      </div>
+
+      <!-- Dialogue Container -->
+      <div id="dialogue-list" class="space-y-4 pb-8"></div>
+    </section>
+
+    <!-- ==================== TAB 2: FLASHCARDS ==================== -->
+    <section id="tab-flashcards" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-extrabold text-slate-800">生字与核心词抽认卡</h2>
+          <p class="text-xs sm:text-sm text-slate-500">点击卡片翻转查看英文释义与课文例句</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-3 py-1.5 rounded-full">
+            已掌握: <span id="fc-mastered-count">0</span> / <span id="fc-total-count">14</span>
+          </span>
+          <button id="fc-shuffle" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-bold transition min-h-[40px]">
+            <i data-lucide="shuffle" class="w-4 h-4"></i>
+            <span>打乱顺序</span>
+          </button>
+          <button id="fc-autoplay" class="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-700 text-xs sm:text-sm font-bold transition min-h-[40px]">
+            <i data-lucide="play-circle" class="w-4 h-4"></i>
+            <span>自动朗读</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Flashcard Stage -->
+      <div class="max-w-xl mx-auto">
+        <div class="perspective-1000 w-full h-80 sm:h-96 cursor-pointer" id="fc-card-wrapper">
+          <div id="fc-card-inner" class="flip-card-inner">
+            <!-- Front -->
+            <div class="flip-card-front bg-white rounded-3xl border-2 border-indigo-100 shadow-xl p-6 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span id="fc-index-badge" class="text-xs font-bold text-slate-400 bg-slate-100 px-3 py-1 rounded-full">1 / 14</span>
+                <div class="flex items-center gap-2">
+                  <button id="fc-pinyin-toggle" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200 hover:bg-sky-100 transition">
+                    拼音: 开
+                  </button>
+                  <button id="fc-speak-front" class="p-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 transition" title="发音">
+                    <i data-lucide="volume-2" class="w-5 h-5"></i>
+                  </button>
+                </div>
+              </div>
+
+              <div class="text-center my-auto space-y-2">
+                <div id="fc-word" class="text-5xl sm:text-6xl font-black font-zh text-slate-800 tracking-wide">礼物</div>
+                <div id="fc-pinyin" class="text-xl sm:text-2xl font-bold text-indigo-600">lǐ wù</div>
+              </div>
+
+              <div class="text-center text-xs text-slate-400 font-medium flex items-center justify-center gap-1">
+                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                <span>点击卡片翻转</span>
+              </div>
+            </div>
+
+            <!-- Back -->
+            <div class="flip-card-back bg-gradient-to-br from-indigo-600 to-purple-700 text-white rounded-3xl shadow-xl p-6 flex flex-col justify-between">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold bg-white/20 px-3 py-1 rounded-full">释义与例句</span>
+                <button id="fc-speak-example" class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/20 hover:bg-white/30 text-white text-xs font-bold transition">
+                  <i data-lucide="volume-2" class="w-4 h-4"></i>
+                  <span>读例句</span>
+                </button>
+              </div>
+
+              <div class="text-center space-y-4 my-auto">
+                <div>
+                  <div class="text-xs uppercase tracking-wider text-indigo-200 font-bold mb-1">English Meaning</div>
+                  <div id="fc-english" class="text-2xl sm:text-3xl font-extrabold text-amber-300">present / gift</div>
+                </div>
+                <div class="bg-white/15 rounded-2xl p-4 backdrop-blur-sm">
+                  <div class="text-xs text-indigo-200 font-bold mb-1">课文例句</div>
+                  <div id="fc-example" class="text-lg sm:text-xl font-zh font-semibold leading-relaxed">它是妈妈去年送给我的生日礼物。</div>
+                </div>
+              </div>
+
+              <div class="text-center text-xs text-indigo-200 font-medium">点击翻回正面</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flashcard Navigation -->
+        <div class="mt-5 flex items-center justify-between gap-3">
+          <button id="fc-prev" class="flex-1 py-3 px-4 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 font-bold text-slate-700 shadow-sm flex items-center justify-center gap-1.5 min-h-[48px]">
+            <i data-lucide="chevron-left" class="w-5 h-5"></i>
+            <span>上一个</span>
+          </button>
+          <button id="fc-mark-mastered" class="flex-1 py-3 px-4 rounded-2xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold shadow-sm flex items-center justify-center gap-1.5 min-h-[48px] transition">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+            <span id="fc-mastered-btn-text">标记已掌握</span>
+          </button>
+          <button id="fc-next" class="flex-1 py-3 px-4 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 font-bold text-slate-700 shadow-sm flex items-center justify-center gap-1.5 min-h-[48px]">
+            <span>下一个</span>
+            <i data-lucide="chevron-right" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: GAME MATRIX ==================== -->
+    <section id="tab-games" class="hidden space-y-5">
+      <!-- Game Selector Pills -->
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <button data-game="quiz" class="game-nav-btn active-game bg-indigo-600 text-white shadow-md p-3 rounded-2xl text-xs sm:text-sm font-bold flex flex-col items-center gap-1 transition">
+          <span class="text-xl">🎧</span>
+          <span>听音辨字</span>
+        </button>
+        <button data-game="memory" class="game-nav-btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 p-3 rounded-2xl text-xs sm:text-sm font-bold flex flex-col items-center gap-1 transition">
+          <span class="text-xl">🃏</span>
+          <span>字词消消乐</span>
+        </button>
+        <button data-game="scramble" class="game-nav-btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 p-3 rounded-2xl text-xs sm:text-sm font-bold flex flex-col items-center gap-1 transition">
+          <span class="text-xl">🧩</span>
+          <span>连词成句</span>
+        </button>
+        <button data-game="feeding" class="game-nav-btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 p-3 rounded-2xl text-xs sm:text-sm font-bold flex flex-col items-center gap-1 transition">
+          <span class="text-xl">🐼</span>
+          <span>喂食小熊猫</span>
+        </button>
+        <button data-game="mole" class="game-nav-btn bg-white text-slate-700 border border-slate-200 hover:bg-slate-50 p-3 rounded-2xl text-xs sm:text-sm font-bold flex flex-col items-center gap-1 transition col-span-2 sm:col-span-1">
+          <span class="text-xl">🔨</span>
+          <span>考点敲地鼠</span>
+        </button>
+      </div>
+
+      <!-- GAME A: Listening Quiz -->
+      <div id="game-quiz" class="game-panel bg-white rounded-3xl border border-slate-200 shadow-lg p-5 sm:p-7 space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800">活动 A：听音辨字 / 辨词</h3>
+            <p class="text-xs sm:text-sm text-slate-500">点击播放发音，选出正确的汉字</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <div class="bg-amber-100 text-amber-900 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold">
+              🔥 连对 Combo: <span id="quiz-combo">0</span>
+            </div>
+            <div class="bg-indigo-100 text-indigo-900 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-extrabold">
+              得分: <span id="quiz-score">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-center py-4 space-y-3">
+          <button id="quiz-play-btn" class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 hover:scale-105 active:scale-95 text-white shadow-xl flex items-center justify-center transition">
+            <i data-lucide="volume-2" class="w-10 h-10"></i>
+          </button>
+          <p id="quiz-hint" class="text-sm font-semibold text-slate-500">点击喇叭听发音</p>
+        </div>
+
+        <div id="quiz-options" class="grid grid-cols-2 gap-3 sm:gap-4 max-w-xl mx-auto"></div>
+        <div id="quiz-feedback" class="text-center font-bold text-base min-h-[28px]"></div>
+      </div>
+
+      <!-- GAME B: Memory Match -->
+      <div id="game-memory" class="game-panel hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-5 sm:p-7 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800">活动 B：字词消消乐 (Memory Pair Match)</h3>
+            <p class="text-xs sm:text-sm text-slate-500">翻开卡片，将汉字与对应的英文/拼音配对</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="bg-sky-100 text-sky-900 px-3 py-1.5 rounded-full text-xs font-extrabold">步数: <span id="mem-moves">0</span></span>
+            <span class="bg-emerald-100 text-emerald-900 px-3 py-1.5 rounded-full text-xs font-extrabold">配对: <span id="mem-pairs">0</span>/6</span>
+            <button id="mem-reset" class="px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">重新开始</button>
+          </div>
+        </div>
+
+        <div id="mem-grid" class="grid grid-cols-3 sm:grid-cols-4 gap-3 max-w-2xl mx-auto"></div>
+      </div>
+
+      <!-- GAME C: Sentence Scramble -->
+      <div id="game-scramble" class="game-panel hidden bg-white rounded-3xl border border-slate-200 shadow-lg p-5 sm:p-7 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-800">活动 C：连词成句 (Sentence Scramble)</h3>
+            <p class="text-xs sm:text-sm text-slate-500">点击或拖拽下方词块，组成正确的课文句子</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="bg-purple-100 text-purple-900 px-3 py-1.5 rounded-full text-xs font-extrabold">
+              第 <span id="scr-index">1</span> / <span id="scr-total">5</span> 题
+            </span>
+            <button id="scr-listen-hint" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition">
+              <i data-lucide="volume-2" class="w-4 h-4"></i>
+              <span>听提示</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+          <div class="text-xs font-bold text-slate-400 mb-1">英文提示</div>
+          <div id="scr-english" class="text-sm sm:text-base font-bold text-slate-700"></div>
+        </div>
+
+        <!-- Answer Dropzone -->
+        <div>
+          <div class="text-xs font-bold text-slate-500 mb-2">你的句子（点击词块可退回）：</div>
+          <div id="scr-answer-zone" class="min-h-[68px] p-3 rounded-2xl border-2 border-dashed border-indigo-300 bg-indigo-50/40 flex flex-wrap gap-2 items-center"></div>
+        </div>
+
+        <!-- Word Bank -->
+        <div>
+          <div class="text-xs font-bold text-slate-500 mb-2">词块区：</div>
+          <div id="scr-bank-zone" class="min-h-[60px] p-3 rounded-2xl bg-slate-100 flex flex-wrap gap-2 items-center"></div>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+          <div id="scr-feedback" class="text-sm font-bold"></div>
+          <div class="flex items-center gap-2 ml-auto">
+            <button id="scr-clear" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm transition">清空</button>
+            <button id="scr-check" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm shadow-sm transition">验证并朗读</button>
+            <button id="scr-next" class="hidden px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm shadow-sm transition">下一句 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME D: Theme Mascot Feeding Game -->
+      <div id="game-feeding" class="game-panel hidden bg-gradient-to-b from-emerald-50 to-teal-50 rounded-3xl border border-emerald-200 shadow-lg p-5 sm:p-7 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-emerald-950">活动 D：喂食礼物小熊猫 🐼</h3>
+            <p class="text-xs sm:text-sm text-emerald-700">根据声音或英文提示，挑选正确的“竹子礼物”喂给小熊猫乐乐</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="bg-white text-emerald-800 px-3 py-1.5 rounded-full text-xs font-extrabold shadow-sm">
+              饱腹度: <span id="feed-progress-text">0 / 6</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="w-full h-3.5 bg-white/80 rounded-full overflow-hidden border border-emerald-200">
+          <div id="feed-progress-bar" class="h-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-300" style="width: 0%"></div>
+        </div>
+
+        <!-- Panda Mascot Stage -->
+        <div class="flex flex-col items-center justify-center py-2 space-y-3">
+          <div id="panda-mascot" class="w-36 h-36 sm:w-44 sm:h-44 transition-transform">
+            <!-- Inline SVG Cute Panda with Birthday Hat -->
+            <svg viewBox="0 0 200 200" class="w-full h-full drop-shadow-md">
+              <!-- Party Hat -->
+              <polygon points="100,12 72,56 128,56" fill="#FF6B6B" stroke="#991B1B" stroke-width="3"/>
+              <circle cx="100" cy="12" r="7" fill="#FDE047"/>
+              <line x1="84" y1="36" x2="116" y2="36" stroke="#FDE047" stroke-width="4"/>
+              <!-- Ears -->
+              <circle cx="52" cy="65" r="22" fill="#1E293B"/>
+              <circle cx="148" cy="65" r="22" fill="#1E293B"/>
+              <!-- Body -->
+              <ellipse cx="100" cy="158" rx="52" ry="38" fill="#FFFFFF" stroke="#1E293B" stroke-width="4"/>
+              <!-- Gift Ribbon on Belly -->
+              <rect x="82" y="145" width="36" height="28" rx="6" fill="#F43F5E"/>
+              <line x1="100" y1="145" x2="100" y2="173" stroke="#FDE047" stroke-width="4"/>
+              <line x1="82" y1="159" x2="118" y2="159" stroke="#FDE047" stroke-width="4"/>
+              <!-- Head -->
+              <ellipse cx="100" cy="100" rx="58" ry="48" fill="#FFFFFF" stroke="#1E293B" stroke-width="4"/>
+              <!-- Eye Patches -->
+              <ellipse cx="75" cy="96" rx="16" ry="19" transform="rotate(-18 75 96)" fill="#1E293B"/>
+              <ellipse cx="125" cy="96" rx="16" ry="19" transform="rotate(18 125 96)" fill="#1E293B"/>
+              <!-- Eyes -->
+              <circle cx="77" cy="94" r="6" fill="#FFFFFF"/>
+              <circle cx="79" cy="93" r="3" fill="#0F172A"/>
+              <circle cx="123" cy="94" r="6" fill="#FFFFFF"/>
+              <circle cx="121" cy="93" r="3" fill="#0F172A"/>
+              <!-- Cheeks -->
+              <ellipse cx="58" cy="116" rx="9" ry="5" fill="#FDA4AF" opacity="0.8"/>
+              <ellipse cx="142" cy="116" rx="9" ry="5" fill="#FDA4AF" opacity="0.8"/>
+              <!-- Nose & Mouth -->
+              <ellipse cx="100" cy="110" rx="8" ry="5" fill="#1E293B"/>
+              <path d="M90,120 Q100,130 110,120" fill="none" stroke="#1E293B" stroke-width="3.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+
+          <div class="bg-white rounded-2xl px-5 py-3 shadow-sm border border-emerald-200 flex items-center gap-3">
+            <button id="feed-speak-btn" class="p-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white transition">
+              <i data-lucide="volume-2" class="w-5 h-5"></i>
+            </button>
+            <div>
+              <div class="text-xs font-bold text-slate-400">乐乐想吃这个词：</div>
+              <div id="feed-prompt-text" class="text-lg font-extrabold text-emerald-900">present / gift</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="feed-options" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl mx-auto"></div>
+        <div id="feed-feedback" class="text-center font-bold text-base min-h-[26px]"></div>
+      </div>
+
+      <!-- GAME E: Whack-a-Mole Challenge -->
+      <div id="game-mole" class="game-panel hidden bg-gradient-to-b from-amber-50 to-orange-50 rounded-3xl border border-amber-200 shadow-lg p-5 sm:p-7 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 class="text-lg sm:text-xl font-extrabold text-amber-950">活动 E：课文考点敲地鼠挑战 🔨</h3>
+            <p class="text-xs sm:text-sm text-amber-800">结合第六课反义词与核心词，倒计时内敲击正确地鼠！</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="bg-white text-rose-600 px-3 py-1.5 rounded-full text-xs sm:text-sm font-extrabold shadow-sm">
+              ⏱️ <span id="mole-timer">45</span>s
+            </span>
+            <span class="bg-white text-indigo-700 px-3 py-1.5 rounded-full text-xs sm:text-sm font-extrabold shadow-sm">
+              得分: <span id="mole-score">0</span>
+            </span>
+            <button id="mole-start-btn" class="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm font-bold shadow-sm transition">
+              开始挑战
+            </button>
+          </div>
+        </div>
+
+        <!-- Target Prompt Banner -->
+        <div class="bg-white border-2 border-orange-300 rounded-2xl p-4 text-center shadow-sm">
+          <div class="text-xs font-bold text-orange-500 uppercase tracking-wider">当前敲击目标</div>
+          <div id="mole-target-prompt" class="text-xl sm:text-2xl font-black font-zh text-slate-800 mt-1">
+            点击“开始挑战”准备出发！
+          </div>
+        </div>
+
+        <!-- 6 Mole Holes -->
+        <div id="mole-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-2xl mx-auto pt-2"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 text-xs text-slate-400 border-t border-slate-200/60 bg-white/50">
+    第六课《妈妈送给我的礼物》交互式双语课件 · 支持 Web Speech API 语音点读与多端触控
+  </footer>
+
+  <script>
+    // ==================== 1. LESSON DATA ====================
+    const DIALOGUE_DATA = [
+      {
+        id: 1,
+        speaker: "洋洋",
+        role: "Yangyang",
+        side: "left",
+        avatarBg: "bg-sky-100 border-sky-300",
+        bubbleBg: "bg-white border-sky-200",
+        english: "Xiaoxi, why are you crying?",
+        tokens: [
+          { ch: "小", py: "xiǎo" }, { ch: "西", py: "xī" }, { ch: "，", py: "", punct: true },
+          { ch: "你", py: "nǐ" }, { ch: "怎", py: "zěn" }, { ch: "么", py: "me" },
+          { ch: "哭", py: "kū" }, { ch: "了", py: "le" }, { ch: "？", py: "", punct: true }
+        ]
+      },
+      {
+        id: 2,
+        speaker: "小西",
+        role: "Xiaoxi",
+        side: "right",
+        avatarBg: "bg-pink-100 border-pink-300",
+        bubbleBg: "bg-pink-50/70 border-pink-200",
+        english: "I lost a book, and I can't find it.",
+        tokens: [
+          { ch: "我", py: "wǒ" }, { ch: "的", py: "de" }, { ch: "一", py: "yì" },
+          { ch: "本", py: "běn" }, { ch: "书", py: "shū" }, { ch: "丢", py: "diū" },
+          { ch: "了", py: "le" }, { ch: "，", py: "", punct: true },
+          { ch: "我", py: "wǒ" }, { ch: "没", py: "méi" }, { ch: "找", py: "zhǎo" },
+          { ch: "到", py: "dào" }, { ch: "它", py: "tā" }, { ch: "。", py: "", punct: true }
+        ]
+      },
+      {
+        id: 3,
+        speaker: "洋洋",
+        role: "Yangyang",
+        side: "left",
+        avatarBg: "bg-sky-100 border-sky-300",
+        bubbleBg: "bg-white border-sky-200",
+        english: "Don't worry, I'll look for it with you. Don't cry. Cheer up. I'm sure we can find it back.",
+        tokens: [
+          { ch: "别", py: "bié" }, { ch: "着", py: "zháo" }, { ch: "急", py: "jí" }, { ch: "，", py: "", punct: true },
+          { ch: "我", py: "wǒ" }, { ch: "和", py: "hé" }, { ch: "你", py: "nǐ" },
+          { ch: "一", py: "yì" }, { ch: "起", py: "qǐ" }, { ch: "找", py: "zhǎo" }, { ch: "。", py: "", punct: true },
+          { ch: "不", py: "bú" }, { ch: "要", py: "yào" }, { ch: "哭", py: "kū" }, { ch: "！", py: "", punct: true },
+          { ch: "笑", py: "xiào" }, { ch: "一", py: "yi" }, { ch: "笑", py: "xiào" }, { ch: "，", py: "", punct: true },
+          { ch: "一", py: "yí" }, { ch: "定", py: "dìng" }, { ch: "能", py: "néng" },
+          { ch: "找", py: "zhǎo" }, { ch: "到", py: "dào" }, { ch: "。", py: "", punct: true }
+        ]
+      },
+      {
+        id: 4,
+        speaker: "小西",
+        role: "Xiaoxi",
+        side: "right",
+        avatarBg: "bg-pink-100 border-pink-300",
+        bubbleBg: "bg-pink-50/70 border-pink-200",
+        english: "I got a lot of pleasure from the book. My Mom bought it in China last year, and she gave it to me for my birthday.",
+        tokens: [
+          { ch: "这", py: "zhè" }, { ch: "本", py: "běn" }, { ch: "书", py: "shū" },
+          { ch: "给", py: "gěi" }, { ch: "了", py: "le" }, { ch: "我", py: "wǒ" },
+          { ch: "很", py: "hěn" }, { ch: "多", py: "duō" }, { ch: "快", py: "kuài" }, { ch: "乐", py: "lè" }, { ch: "。", py: "", punct: true },
+          { ch: "它", py: "tā" }, { ch: "是", py: "shì" }, { ch: "妈", py: "mā" }, { ch: "妈", py: "ma" },
+          { ch: "从", py: "cóng" }, { ch: "中", py: "zhōng" }, { ch: "国", py: "guó" },
+          { ch: "买", py: "mǎi" }, { ch: "来", py: "lái" }, { ch: "的", py: "de" }, { ch: "，", py: "", punct: true },
+          { ch: "去", py: "qù" }, { ch: "年", py: "nián" }, { ch: "送", py: "sòng" },
+          { ch: "给", py: "gěi" }, { ch: "我", py: "wǒ" }, { ch: "的", py: "de" },
+          { ch: "生", py: "shēng" }, { ch: "日", py: "rì" }, { ch: "礼", py: "lǐ" }, { ch: "物", py: "wù" }, { ch: "。", py: "", punct: true }
+        ]
+      },
+      {
+        id: 5,
+        speaker: "洋洋",
+        role: "Yangyang",
+        side: "left",
+        avatarBg: "bg-sky-100 border-sky-300",
+        bubbleBg: "bg-white border-sky-200",
+        english: "Look! Here is a book. Is it yours?",
+        tokens: [
+          { ch: "这", py: "zhè" }, { ch: "儿", py: "er" }, { ch: "有", py: "yǒu" },
+          { ch: "本", py: "běn" }, { ch: "书", py: "shū" }, { ch: "，", py: "", punct: true },
+          { ch: "是", py: "shì" }, { ch: "你", py: "nǐ" }, { ch: "的", py: "de" }, { ch: "吧", py: "ba" }, { ch: "？", py: "", punct: true }
+        ]
+      },
+      {
+        id: 6,
+        speaker: "小西",
+        role: "Xiaoxi",
+        side: "right",
+        avatarBg: "bg-pink-100 border-pink-300",
+        bubbleBg: "bg-pink-50/70 border-pink-200",
+        english: "Yes. I'm so happy to find it back. I will never lose it again.",
+        tokens: [
+          { ch: "就", py: "jiù" }, { ch: "是", py: "shì" }, { ch: "这", py: "zhè" }, { ch: "本", py: "běn" }, { ch: "。", py: "", punct: true },
+          { ch: "找", py: "zhǎo" }, { ch: "到", py: "dào" }, { ch: "它", py: "tā" },
+          { ch: "我", py: "wǒ" }, { ch: "太", py: "tài" }, { ch: "高", py: "gāo" }, { ch: "兴", py: "xìng" }, { ch: "了", py: "le" }, { ch: "！", py: "", punct: true },
+          { ch: "我", py: "wǒ" }, { ch: "一", py: "yí" }, { ch: "定", py: "dìng" },
+          { ch: "不", py: "bú" }, { ch: "会", py: "huì" }, { ch: "再", py: "zài" }, { ch: "丢", py: "diū" }, { ch: "了", py: "le" }, { ch: "。", py: "", punct: true }
+        ]
+      }
+    ];
+
+    const VOCAB_DATA = [
+      { id: 1, word: "礼物", pinyin: "lǐ wù", english: "present / gift", example: "它是妈妈去年送给我的生日礼物。" },
+      { id: 2, word: "怎么", pinyin: "zěn me", english: "why / how", example: "小西，你怎么哭了？" },
+      { id: 3, word: "哭", pinyin: "kū", english: "to cry", example: "不要哭！笑一笑，一定能找到。" },
+      { id: 4, word: "丢", pinyin: "diū", english: "to lose", example: "我的一本书丢了，我没找到它。" },
+      { id: 5, word: "找到", pinyin: "zhǎo dào", english: "to find", example: "找到它我太高兴了！" },
+      { id: 6, word: "着急", pinyin: "zháo jí", english: "worried / anxious", example: "别着急，我和你一起找。" },
+      { id: 7, word: "一起", pinyin: "yì qǐ", english: "together", example: "我和你一起找。" },
+      { id: 8, word: "一定", pinyin: "yí dìng", english: "certainly / definitely", example: "笑一笑，一定能找到。" },
+      { id: 9, word: "快乐", pinyin: "kuài lè", english: "pleasure / happy", example: "这本书给了我很多快乐。" },
+      { id: 10, word: "送给", pinyin: "sòng gěi", english: "to give (as a gift)", example: "去年送给我的生日礼物。" },
+      { id: 11, word: "生日", pinyin: "shēng rì", english: "birthday", example: "这是妈妈送给我的生日礼物。" },
+      { id: 12, word: "高兴", pinyin: "gāo xìng", english: "happy / glad", example: "找到它我太高兴了！" },
+      { id: 13, word: "去年", pinyin: "qù nián", english: "last year", example: "它是妈妈从中国买来的，去年送给我的。" },
+      { id: 14, word: "笑一笑", pinyin: "xiào yi xiào", english: "cheer up / smile", example: "不要哭！笑一笑，一定能找到。" }
+    ];
+
+    const SCRAMBLE_SENTENCES = [
+      {
+        chunks: ["小西，", "你", "怎么", "哭了？"],
+        english: "Xiaoxi, why are you crying?"
+      },
+      {
+        chunks: ["我的", "一本书", "丢了，", "我", "没找到它。"],
+        english: "I lost a book, and I can't find it."
+      },
+      {
+        chunks: ["别着急，", "我和你", "一起找。"],
+        english: "Don't worry, I'll look for it with you."
+      },
+      {
+        chunks: ["这本书", "给了我", "很多", "快乐。"],
+        english: "I got a lot of pleasure from the book."
+      },
+      {
+        chunks: ["找到它", "我", "太高兴了！"],
+        english: "I'm so happy to find it back!"
+      }
+    ];
+
+    const MOLE_CHALLENGES = [
+      { prompt: "找出【哭】的反义词", answer: "笑", distractors: ["丢", "找", "买", "哭"] },
+      { prompt: "找出【丢】的反义词", answer: "找到", distractors: ["着急", "礼物", "去年", "不会"] },
+      { prompt: "找出【present / gift】", answer: "礼物", distractors: ["生日", "快乐", "中国", "怎么"] },
+      { prompt: "找出【worried / anxious】", answer: "着急", distractors: ["高兴", "一起", "一定", "笑"] },
+      { prompt: "找出【去年】的反义词", answer: "今年", distractors: ["生日", "快乐", "礼物", "一起"] },
+      { prompt: "找出【happy / glad】", answer: "高兴", distractors: ["哭", "丢", "着急", "怎么"] },
+      { prompt: "找出【together】", answer: "一起", distractors: ["一定", "送给", "找到", "不会"] }
+    ];
+
+    // ==================== 2. AUDIO & SPEECH ENGINE ====================
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function getAudioCtx() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) audioCtx = new AudioContext();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(() => {});
+      }
+      return audioCtx;
+    }
+
+    function playSFX(type) {
+      if (!soundEnabled) return;
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      if (type === 'correct') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.26);
+      } else if (type === 'wrong') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.linearRampToValueAtTime(160, now + 0.2);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
+        osc.start(now);
+        osc.stop(now + 0.23);
+      } else if (type === 'pop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(420, now);
+        osc.frequency.exponentialRampToValueAtTime(640, now + 0.06);
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.09);
+      } else if (type === 'win') {
+        [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
+          const o = ctx.createOscillator();
+          const g = ctx.createGain();
+          o.type = 'sine';
+          o.frequency.setValueAtTime(freq, now + idx * 0.09);
+          g.gain.setValueAtTime(0.16, now + idx * 0.09);
+          g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.09 + 0.25);
+          o.connect(g);
+          g.connect(ctx.destination);
+          o.start(now + idx * 0.09);
+          o.stop(now + idx * 0.09 + 0.26);
+        });
+      }
+    }
+
+    // Speech Synthesis with Dual Scheduling Anti-Stall
+    let currentRate = 0.85;
+    let selectedVoice = null;
+
+    function pickMandarinVoice() {
+      if (!('speechSynthesis' in window)) return null;
+      const voices = window.speechSynthesis.getVoices();
+      if (!voices.length) return null;
+      const priority = [
+        v => v.lang === 'zh-CN' && /ting|mei|google|xiaoxiao|yunxi|microsoft/i.test(v.name),
+        v => v.lang === 'zh-CN',
+        v => v.lang.toLowerCase().startsWith('zh-cn'),
+        v => v.lang.toLowerCase().startsWith('zh-tw'),
+        v => v.lang.toLowerCase().startsWith('zh')
+      ];
+      for (const test of priority) {
+        const match = voices.find(test);
+        if (match) {
+          selectedVoice = match;
+          const statusEl = document.getElementById('voice-status');
+          if (statusEl) statusEl.textContent = `语音: ${match.name.slice(0, 22)}`;
+          return match;
+        }
+      }
+      return null;
+    }
+
+    if ('speechSynthesis' in window) {
+      pickMandarinVoice();
+      window.speechSynthesis.onvoiceschanged = pickMandarinVoice;
+    }
+
+    function speakText(text, rateOverride = null) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'zh-CN';
+      if (!selectedVoice) pickMandarinVoice();
+      if (selectedVoice) utter.voice = selectedVoice;
+      utter.rate = rateOverride !== null ? rateOverride : currentRate;
+      window.speechSynthesis.speak(utter);
+    }
+
+    // ==================== 3. GLOBAL STATE & TABS ====================
+    let globalScore = 0;
+    function addGlobalScore(pts) {
+      globalScore += pts;
+      document.getElementById('global-score').textContent = globalScore;
+    }
+
+    document.getElementById('btn-sound-toggle').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      const label = document.getElementById('sound-label');
+      label.textContent = soundEnabled ? '音效开' : '静音';
+      if (soundEnabled) playSFX('pop');
+    });
+
+    document.querySelectorAll('.nav-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        stopPlayback();
+        stopAutoplayFlashcard();
+        const target = btn.dataset.tab;
+        document.querySelectorAll('.nav-tab').forEach(b => {
+          b.classList.remove('bg-white', 'text-indigo-700', 'shadow');
+          b.classList.add('text-white/90', 'hover:bg-white/15');
+        });
+        btn.classList.add('bg-white', 'text-indigo-700', 'shadow');
+        btn.classList.remove('text-white/90', 'hover:bg-white/15');
+
+        ['reader', 'flashcards', 'games'].forEach(t => {
+          document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== target);
+        });
+      });
+    });
+
+    // ==================== 4. MODULE 1: INTERACTIVE READER ====================
+    let showPinyin = true;
+    let showEnglish = true;
+    let isPlayingAll = false;
+    let isPaused = false;
+    let playSessionToken = 0;
+    let currentSentenceIdx = 0;
+    let karaokeTimer = null;
+    let fallbackNextTimer = null;
+
+    function getAvatarSVG(speaker) {
+      if (speaker === '洋洋') {
+        return `<svg viewBox="0 0 80 80" class="w-11 h-11 sm:w-12 sm:h-12">
+          <circle cx="40" cy="40" r="38" fill="#E0F2FE"/>
+          <path d="M22,35 Q40,12 58,35 L58,28 Q40,8 22,28 Z" fill="#1E293B"/>
+          <circle cx="40" cy="42" r="18" fill="#FDE68A"/>
+          <path d="M22,36 Q40,18 58,36 Q56,22 40,20 Q24,22 22,36 Z" fill="#1E293B"/>
+          <circle cx="33" cy="42" r="2.5" fill="#1E293B"/>
+          <circle cx="47" cy="42" r="2.5" fill="#1E293B"/>
+          <path d="M35,50 Q40,54 45,50" fill="none" stroke="#B45309" stroke-width="2" stroke-linecap="round"/>
+        </svg>`;
+      }
+      return `<svg viewBox="0 0 80 80" class="w-11 h-11 sm:w-12 sm:h-12">
+        <circle cx="40" cy="40" r="38" fill="#FCE7F3"/>
+        <circle cx="18" cy="36" r="8" fill="#1E293B"/>
+        <circle cx="62" cy="36" r="8" fill="#1E293B"/>
+        <circle cx="40" cy="42" r="18" fill="#FDE68A"/>
+        <path d="M22,38 Q40,22 58,38 Q56,20 40,18 Q24,20 22,38 Z" fill="#1E293B"/>
+        <circle cx="33" cy="42" r="2.5" fill="#1E293B"/>
+        <circle cx="47" cy="42" r="2.5" fill="#1E293B"/>
+        <ellipse cx="29" cy="47" rx="3" ry="1.8" fill="#FB7185"/>
+        <ellipse cx="51" cy="47" rx="3" ry="1.8" fill="#FB7185"/>
+        <path d="M36,50 Q40,53 44,50" fill="none" stroke="#BE185D" stroke-width="2" stroke-linecap="round"/>
+      </svg>`;
+    }
+
+    function renderDialogue() {
+      const container = document.getElementById('dialogue-list');
+      container.innerHTML = '';
+
+      DIALOGUE_DATA.forEach((item, sIdx) => {
+        const isRight = item.side === 'right';
+        const row = document.createElement('div');
+        row.className = `flex items-start gap-3 ${isRight ? 'flex-row-reverse' : ''}`;
+
+        const avatarWrap = document.createElement('div');
+        avatarWrap.className = 'flex flex-col items-center shrink-0 gap-1';
+        avatarWrap.innerHTML = `
+          <div class="rounded-full border-2 ${item.avatarBg} overflow-hidden shadow-sm">${getAvatarSVG(item.speaker)}</div>
+          <span class="text-xs font-bold text-slate-600">${item.speaker}</span>
+        `;
+
+        const bubble = document.createElement('div');
+        bubble.id = `sentence-card-${sIdx}`;
+        bubble.className = `flex-1 max-w-2xl rounded-3xl border-2 ${item.bubbleBg} p-4 sm:p-5 shadow-sm transition-all duration-200`;
+
+        const topRow = document.createElement('div');
+        topRow.className = 'flex items-start justify-between gap-2';
+
+        const tokensWrap = document.createElement('div');
+        tokensWrap.className = 'flex flex-wrap items-end leading-tight';
+
+        let charCounter = 0;
+        item.tokens.forEach(tok => {
+          if (tok.punct) {
+            const sp = document.createElement('span');
+            sp.className = 'punct-token text-xl sm:text-2xl font-zh text-slate-500';
+            sp.innerHTML = `${showPinyin ? '<span class="text-[11px] h-4"></span>' : ''}<span>${tok.ch}</span>`;
+            tokensWrap.appendChild(sp);
+          } else {
+            const cIdx = charCounter++;
+            const sp = document.createElement('span');
+            sp.className = 'char-token';
+            sp.id = `tok-${sIdx}-${cIdx}`;
+            sp.innerHTML = `
+              <span class="pinyin-line text-[11px] sm:text-xs font-semibold text-indigo-600 h-4 leading-4 ${showPinyin ? '' : 'hidden'}">${tok.py}</span>
+              <span class="text-xl sm:text-2xl font-bold font-zh text-slate-800">${tok.ch}</span>
+            `;
+            sp.addEventListener('click', (e) => {
+              e.stopPropagation();
+              speakText(tok.ch);
+              showCharTooltip(tok.ch, tok.py, e.currentTarget);
+            });
+            tokensWrap.appendChild(sp);
+          }
+        });
+
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'shrink-0 w-10 h-10 rounded-xl bg-amber-100 hover:bg-amber-200 active:scale-95 text-amber-800 flex items-center justify-center transition shadow-sm';
+        speakBtn.title = '朗读这一句';
+        speakBtn.innerHTML = '🔊';
+        speakBtn.addEventListener('click', () => {
+          stopPlayback();
+          playSingleSentence(sIdx, false);
+        });
+
+        topRow.appendChild(tokensWrap);
+        topRow.appendChild(speakBtn);
+        bubble.appendChild(topRow);
+
+        const engEl = document.createElement('p');
+        engEl.className = `mt-2.5 pt-2 border-t border-slate-200/70 text-xs sm:text-sm text-slate-500 font-medium ${showEnglish ? '' : 'hidden'}`;
+        engEl.textContent = item.english;
+        bubble.appendChild(engEl);
+
+        row.appendChild(avatarWrap);
+        row.appendChild(bubble);
+        container.appendChild(row);
+      });
+    }
+
+    let tooltipTimer = null;
+    function showCharTooltip(ch, py, el) {
+      const tip = document.getElementById('char-tooltip');
+      document.getElementById('tooltip-char').textContent = ch;
+      document.getElementById('tooltip-pinyin').textContent = py;
+      const rect = el.getBoundingClientRect();
+      tip.style.left = `${Math.min(window.innerWidth - 130, Math.max(12, rect.left + rect.width / 2 - 45))}px`;
+      tip.style.top = `${Math.max(12, rect.top - 48)}px`;
+      tip.classList.remove('opacity-0');
+      clearTimeout(tooltipTimer);
+      tooltipTimer = setTimeout(() => tip.classList.add('opacity-0'), 1300);
+    }
+
+    function clearKaraokeHighlights() {
+      clearInterval(karaokeTimer);
+      clearTimeout(fallbackNextTimer);
+      document.querySelectorAll('.sentence-active').forEach(el => el.classList.remove('sentence-active'));
+      document.querySelectorAll('.karaoke-active, .karaoke-passed').forEach(el => {
+        el.classList.remove('karaoke-active', 'karaoke-passed');
+      });
+    }
+
+    function playSingleSentence(sIdx, chainNext) {
+      const token = ++playSessionToken;
+      clearKaraokeHighlights();
+
+      const item = DIALOGUE_DATA[sIdx];
+      if (!item) {
+        stopPlayback();
+        return;
+      }
+
+      currentSentenceIdx = sIdx;
+      const card = document.getElementById(`sentence-card-${sIdx}`);
+      if (card) {
+        card.classList.add('sentence-active');
+        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      const plainText = item.tokens.map(t => t.ch).join('');
+      const playableChars = item.tokens.filter(t => !t.punct);
+      const totalChars = playableChars.length;
+
+      // Dynamic karaoke per-char timing calibrated to currentRate (0.3x ~ 1.0x)
+      const msPerChar = Math.round(255 / currentRate);
+      let activeIdx = 0;
+
+      function highlightCharAt(idx) {
+        for (let i = 0; i < totalChars; i++) {
+          const el = document.getElementById(`tok-${sIdx}-${i}`);
+          if (!el) continue;
+          el.classList.remove('karaoke-active', 'karaoke-passed');
+          if (i < idx) el.classList.add('karaoke-passed');
+          else if (i === idx) el.classList.add('karaoke-active');
+        }
+      }
+
+      highlightCharAt(0);
+      karaokeTimer = setInterval(() => {
+        if (token !== playSessionToken || isPaused) return;
+        activeIdx++;
+        if (activeIdx < totalChars) {
+          highlightCharAt(activeIdx);
+        } else {
+          clearInterval(karaokeTimer);
+        }
+      }, msPerChar);
+
+      let finished = false;
+      function advance() {
+        if (finished || token !== playSessionToken) return;
+        finished = true;
+        clearInterval(karaokeTimer);
+        clearTimeout(fallbackNextTimer);
+        if (chainNext && isPlayingAll && !isPaused) {
+          if (sIdx + 1 < DIALOGUE_DATA.length) {
+            setTimeout(() => {
+              if (token === playSessionToken && isPlayingAll && !isPaused) {
+                playSingleSentence(sIdx + 1, true);
+              }
+            }, 350);
+          } else {
+            stopPlayback();
+          }
+        } else if (!chainNext) {
+          setTimeout(() => {
+            if (token === playSessionToken) clearKaraokeHighlights();
+          }, 400);
+        }
+      }
+
+      // Dual scheduling: SpeechSynthesis onend/onerror + Safety Fallback Timer
+      const estimatedMs = Math.max(1800, Math.round((totalChars * 280) / currentRate) + 1800);
+      fallbackNextTimer = setTimeout(advance, estimatedMs);
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(plainText);
+        utter.lang = 'zh-CN';
+        if (!selectedVoice) pickMandarinVoice();
+        if (selectedVoice) utter.voice = selectedVoice;
+        utter.rate = currentRate;
+
+        utter.onend = advance;
+        utter.onerror = advance;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+
+    function updatePlayButtonsUI() {
+      const btnPlay = document.getElementById('btn-play-all');
+      const btnPause = document.getElementById('btn-pause-all');
+      if (isPlayingAll && !isPaused) {
+        btnPlay.classList.add('hidden');
+        btnPause.classList.remove('hidden');
+        btnPause.classList.add('flex');
+      } else {
+        btnPlay.classList.remove('hidden');
+        btnPause.classList.add('hidden');
+        btnPause.classList.remove('flex');
+      }
+    }
+
+    function stopPlayback() {
+      playSessionToken++;
+      isPlayingAll = false;
+      isPaused = false;
+      currentSentenceIdx = 0;
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      clearKaraokeHighlights();
+      updatePlayButtonsUI();
+    }
+
+    document.getElementById('btn-play-all').addEventListener('click', () => {
+      if (isPaused) {
+        isPaused = false;
+        updatePlayButtonsUI();
+        playSingleSentence(currentSentenceIdx, true);
+      } else {
+        isPlayingAll = true;
+        isPaused = false;
+        updatePlayButtonsUI();
+        playSingleSentence(0, true);
+      }
+    });
+
+    document.getElementById('btn-pause-all').addEventListener('click', () => {
+      isPaused = true;
+      playSessionToken++;
+      clearInterval(karaokeTimer);
+      clearTimeout(fallbackNextTimer);
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      updatePlayButtonsUI();
+    });
+
+    document.getElementById('btn-stop-all').addEventListener('click', stopPlayback);
+
+    document.querySelectorAll('.rate-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentRate = parseFloat(btn.dataset.rate);
+        document.querySelectorAll('.rate-btn').forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+          b.classList.add('text-slate-600', 'hover:bg-white');
+        });
+        btn.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+        btn.classList.remove('text-slate-600', 'hover:bg-white');
+
+        if (isPlayingAll && !isPaused) {
+          playSingleSentence(currentSentenceIdx, true);
+        }
+      });
+    });
+
+    document.getElementById('toggle-pinyin').addEventListener('click', (e) => {
+      showPinyin = !showPinyin;
+      e.currentTarget.querySelector('span').textContent = showPinyin ? '拼音 ON' : '拼音 OFF';
+      e.currentTarget.classList.toggle('bg-indigo-50', showPinyin);
+      e.currentTarget.classList.toggle('bg-slate-100', !showPinyin);
+      renderDialogue();
+    });
+
+    document.getElementById('toggle-english').addEventListener('click', (e) => {
+      showEnglish = !showEnglish;
+      e.currentTarget.querySelector('span').textContent = showEnglish ? '英文 ON' : '英文 OFF';
+      e.currentTarget.classList.toggle('bg-sky-50', showEnglish);
+      e.currentTarget.classList.toggle('bg-slate-100', !showEnglish);
+      renderDialogue();
+    });
+
+    // ==================== 5. MODULE 2: FLASHCARDS ====================
+    let fcDeck = [...VOCAB_DATA];
+    let fcIndex = 0;
+    let fcShowPinyin = true;
+    let fcMastered = new Set();
+    let fcAutoplayTimer = null;
+
+    function renderFlashcard() {
+      const card = fcDeck[fcIndex];
+      document.getElementById('fc-card-inner').classList.remove('is-flipped');
+      document.getElementById('fc-index-badge').textContent = `${fcIndex + 1} / ${fcDeck.length}`;
+      document.getElementById('fc-word').textContent = card.word;
+      document.getElementById('fc-pinyin').textContent = card.pinyin;
+      document.getElementById('fc-pinyin').classList.toggle('hidden', !fcShowPinyin);
+      document.getElementById('fc-english').textContent = card.english;
+      document.getElementById('fc-example').textContent = card.example;
+
+      const isMastered = fcMastered.has(card.id);
+      const mBtn = document.getElementById('fc-mark-mastered');
+      document.getElementById('fc-mastered-btn-text').textContent = isMastered ? '已掌握 ✓' : '标记已掌握';
+      mBtn.classList.toggle('bg-emerald-600', isMastered);
+      mBtn.classList.toggle('bg-emerald-500', !isMastered);
+      document.getElementById('fc-mastered-count').textContent = fcMastered.size;
+      document.getElementById('fc-total-count').textContent = fcDeck.length;
+    }
+
+    document.getElementById('fc-card-wrapper').addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      document.getElementById('fc-card-inner').classList.toggle('is-flipped');
+      playSFX('pop');
+    });
+
+    document.getElementById('fc-pinyin-toggle').addEventListener('click', (e) => {
+      e.stopPropagation();
+      fcShowPinyin = !fcShowPinyin;
+      e.currentTarget.textContent = fcShowPinyin ? '拼音: 开' : '拼音: 关';
+      document.getElementById('fc-pinyin').classList.toggle('hidden', !fcShowPinyin);
+    });
+
+    document.getElementById('fc-speak-front').addEventListener('click', (e) => {
+      e.stopPropagation();
+      speakText(fcDeck[fcIndex].word);
+    });
+
+    document.getElementById('fc-speak-example').addEventListener('click', (e) => {
+      e.stopPropagation();
+      speakText(fcDeck[fcIndex].example);
+    });
+
+    document.getElementById('fc-prev').addEventListener('click', () => {
+      fcIndex = (fcIndex - 1 + fcDeck.length) % fcDeck.length;
+      renderFlashcard();
+    });
+
+    document.getElementById('fc-next').addEventListener('click', () => {
+      fcIndex = (fcIndex + 1) % fcDeck.length;
+      renderFlashcard();
+    });
+
+    document.getElementById('fc-mark-mastered').addEventListener('click', () => {
+      const id = fcDeck[fcIndex].id;
+      if (fcMastered.has(id)) fcMastered.delete(id);
+      else {
+        fcMastered.add(id);
+        playSFX('correct');
+        addGlobalScore(5);
+      }
+      renderFlashcard();
+    });
+
+    document.getElementById('fc-shuffle').addEventListener('click', () => {
+      fcDeck.sort(() => Math.random() - 0.5);
+      fcIndex = 0;
+      playSFX('pop');
+      renderFlashcard();
+    });
+
+    function stopAutoplayFlashcard() {
+      if (fcAutoplayTimer) {
+        clearInterval(fcAutoplayTimer);
+        fcAutoplayTimer = null;
+        document.getElementById('fc-autoplay').querySelector('span').textContent = '自动朗读';
+      }
+    }
+
+    document.getElementById('fc-autoplay').addEventListener('click', () => {
+      if (fcAutoplayTimer) {
+        stopAutoplayFlashcard();
+        return;
+      }
+      document.getElementById('fc-autoplay').querySelector('span').textContent = '停止朗读';
+      speakText(fcDeck[fcIndex].word);
+      fcAutoplayTimer = setInterval(() => {
+        fcIndex = (fcIndex + 1) % fcDeck.length;
+        renderFlashcard();
+        speakText(fcDeck[fcIndex].word);
+      }, 2600);
+    });
+
+    // ==================== 6. MODULE 3: GAMES ====================
+    document.querySelectorAll('.game-nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const g = btn.dataset.game;
+        document.querySelectorAll('.game-nav-btn').forEach(b => {
+          b.classList.remove('bg-indigo-600', 'text-white', 'shadow-md');
+          b.classList.add('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+        });
+        btn.classList.add('bg-indigo-600', 'text-white', 'shadow-md');
+        btn.classList.remove('bg-white', 'text-slate-700', 'border', 'border-slate-200');
+
+        document.querySelectorAll('.game-panel').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`game-${g}`).classList.remove('hidden');
+      });
+    });
+
+    // --- Game A: Listening Quiz ---
+    let quizTarget = null;
+    let quizCombo = 0;
+    let quizScore = 0;
+    let quizLocked = false;
+
+    function nextQuizQuestion() {
+      quizLocked = false;
+      document.getElementById('quiz-feedback').textContent = '';
+      const pool = [...VOCAB_DATA].sort(() => Math.random() - 0.5);
+      const choices = pool.slice(0, 4);
+      quizTarget = choices[Math.floor(Math.random() * 4)];
+
+      const optWrap = document.getElementById('quiz-options');
+      optWrap.innerHTML = '';
+      choices.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'p-5 rounded-2xl border-2 border-slate-200 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50 transition text-center space-y-1 active:scale-95';
+        btn.innerHTML = `<div class="text-2xl sm:text-3xl font-black font-zh text-slate-800">${item.word}</div><div class="text-xs text-slate-400 font-semibold">${item.english}</div>`;
+        btn.addEventListener('click', () => {
+          if (quizLocked) return;
+          if (item.id === quizTarget.id) {
+            quizLocked = true;
+            quizCombo++;
+            const pts = 10 + (quizCombo > 1 ? quizCombo * 2 : 0);
+            quizScore += pts;
+            addGlobalScore(pts);
+            btn.classList.add('border-emerald-500', 'bg-emerald-50');
+            playSFX('correct');
+            document.getElementById('quiz-feedback').innerHTML = `<span class="text-emerald-600">🎉 答对了！+${pts}分</span>`;
+            if (quizCombo >= 3 && typeof confetti === 'function') {
+              confetti({ particleCount: 40, spread: 60, origin: { y: 0.7 } });
+            }
+            setTimeout(nextQuizQuestion, 1100);
+          } else {
+            quizCombo = 0;
+            btn.classList.add('border-rose-400', 'bg-rose-50');
+            playSFX('wrong');
+            document.getElementById('quiz-feedback').innerHTML = `<span class="text-rose-500">再听一次试试看！</span>`;
+          }
+          document.getElementById('quiz-combo').textContent = quizCombo;
+          document.getElementById('quiz-score').textContent = quizScore;
+        });
+        optWrap.appendChild(btn);
+      });
+    }
+
+    document.getElementById('quiz-play-btn').addEventListener('click', () => {
+      if (quizTarget) speakText(quizTarget.word);
+    });
+
+    // --- Game B: Memory Match ---
+    let memFlipped = [];
+    let memMatched = 0;
+    let memMoves = 0;
+    let memLock = false;
+
+    function initMemoryGame() {
+      memFlipped = [];
+      memMatched = 0;
+      memMoves = 0;
+      memLock = false;
+      document.getElementById('mem-moves').textContent = '0';
+      document.getElementById('mem-pairs').textContent = '0';
+
+      const picked = [...VOCAB_DATA].sort(() => Math.random() - 0.5).slice(0, 6);
+      const cards = [];
+      picked.forEach(v => {
+        cards.push({ pairId: v.id, text: v.word, sub: '汉字', isZh: true });
+        cards.push({ pairId: v.id, text: v.english, sub: v.pinyin, isZh: false });
+      });
+      cards.sort(() => Math.random() - 0.5);
+
+      const grid = document.getElementById('mem-grid');
+      grid.innerHTML = '';
+      cards.forEach(c => {
+        const slot = document.createElement('div');
+        slot.className = 'perspective-1000 h-24 sm:h-28 cursor-pointer';
+        slot.innerHTML = `
+          <div class="mem-card-inner">
+            <div class="mem-face rounded-2xl bg-gradient-to-br from-indigo-500 to-sky-500 text-white flex items-center justify-center text-2xl font-bold shadow-md border-2 border-white">🎁</div>
+            <div class="mem-face mem-back rounded-2xl bg-white border-2 border-indigo-200 p-2 flex flex-col items-center justify-center text-center shadow-sm">
+              <div class="${c.isZh ? 'text-xl sm:text-2xl font-black font-zh text-slate-800' : 'text-xs sm:text-sm font-bold text-indigo-700'}">${c.text}</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">${c.sub}</div>
+            </div>
+          </div>
+        `;
+        slot.addEventListener('click', () => {
+          const inner = slot.querySelector('.mem-card-inner');
+          if (memLock || inner.classList.contains('flipped')) return;
+          inner.classList.add('flipped');
+          playSFX('pop');
+          if (c.isZh) speakText(c.text);
+
+          memFlipped.push({ slot, inner, pairId: c.pairId });
+          if (memFlipped.length === 2) {
+            memMoves++;
+            document.getElementById('mem-moves').textContent = memMoves;
+            memLock = true;
+            const [a, b] = memFlipped;
+            if (a.pairId === b.pairId) {
+              memMatched++;
+              document.getElementById('mem-pairs').textContent = memMatched;
+              playSFX('correct');
+              addGlobalScore(15);
+              memFlipped = [];
+              memLock = false;
+              if (memMatched === 6 && typeof confetti === 'function') {
+                playSFX('win');
+                confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+              }
+            } else {
+              setTimeout(() => {
+                a.inner.classList.remove('flipped');
+                b.inner.classList.remove('flipped');
+                memFlipped = [];
+                memLock = false;
+              }, 800);
+            }
+          }
+        });
+        grid.appendChild(slot);
+      });
+    }
+    document.getElementById('mem-reset').addEventListener('click', initMemoryGame);
+
+    // --- Game C: Sentence Scramble ---
+    let scrIdx = 0;
+    let scrSelected = [];
+    let scrBank = [];
+
+    function loadScramble() {
+      const item = SCRAMBLE_SENTENCES[scrIdx];
+      document.getElementById('scr-index').textContent = scrIdx + 1;
+      document.getElementById('scr-total').textContent = SCRAMBLE_SENTENCES.length;
+      document.getElementById('scr-english').textContent = item.english;
+      document.getElementById('scr-feedback').textContent = '';
+      document.getElementById('scr-next').classList.add('hidden');
+
+      scrSelected = [];
+      scrBank = item.chunks.map((text, idx) => ({ id: idx, text })).sort(() => Math.random() - 0.5);
+      renderScrambleZones();
+    }
+
+    function renderScrambleZones() {
+      const ansZone = document.getElementById('scr-answer-zone');
+      const bankZone = document.getElementById('scr-bank-zone');
+      ansZone.innerHTML = '';
+      bankZone.innerHTML = '';
+
+      scrSelected.forEach((chunk, pos) => {
+        const btn = document.createElement('button');
+        btn.className = 'px-3.5 py-2 rounded-xl bg-indigo-600 text-white font-zh font-bold text-base shadow-sm hover:bg-indigo-700 transition';
+        btn.textContent = chunk.text;
+        btn.addEventListener('click', () => {
+          scrSelected.splice(pos, 1);
+          scrBank.push(chunk);
+          playSFX('pop');
+          renderScrambleZones();
+        });
+        ansZone.appendChild(btn);
+      });
+
+      scrBank.forEach((chunk, pos) => {
+        const btn = document.createElement('button');
+        btn.className = 'px-3.5 py-2 rounded-xl bg-white border border-slate-300 text-slate-800 font-zh font-bold text-base shadow-sm hover:border-indigo-400 transition';
+        btn.textContent = chunk.text;
+        btn.addEventListener('click', () => {
+          scrBank.splice(pos, 1);
+          scrSelected.push(chunk);
+          playSFX('pop');
+          renderScrambleZones();
+        });
+        bankZone.appendChild(btn);
+      });
+    }
+
+    document.getElementById('scr-listen-hint').addEventListener('click', () => {
+      speakText(SCRAMBLE_SENTENCES[scrIdx].chunks.join(''));
+    });
+
+    document.getElementById('scr-clear').addEventListener('click', loadScramble);
+
+    document.getElementById('scr-check').addEventListener('click', () => {
+      const userStr = scrSelected.map(c => c.text).join('');
+      const targetStr = SCRAMBLE_SENTENCES[scrIdx].chunks.join('');
+      const fb = document.getElementById('scr-feedback');
+      if (userStr === targetStr) {
+        playSFX('correct');
+        speakText(targetStr);
+        addGlobalScore(20);
+        fb.innerHTML = '<span class="text-emerald-600">✅ 太棒了！句子完全正确！</span>';
+        document.getElementById('scr-next').classList.remove('hidden');
+        if (typeof confetti === 'function') confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+      } else {
+        playSFX('wrong');
+        fb.innerHTML = '<span class="text-rose-500">语序还差一点点，再调整一下吧！</span>';
+      }
+    });
+
+    document.getElementById('scr-next').addEventListener('click', () => {
+      scrIdx = (scrIdx + 1) % SCRAMBLE_SENTENCES.length;
+      loadScramble();
+    });
+
+    // --- Game D: Mascot Feeding Game ---
+    let feedProgress = 0;
+    const FEED_GOAL = 6;
+    let feedTarget = null;
+
+    function nextFeedingRound() {
+      document.getElementById('feed-feedback').textContent = '';
+      const pool = [...VOCAB_DATA].sort(() => Math.random() - 0.5);
+      const choices = pool.slice(0, 6);
+      feedTarget = choices[Math.floor(Math.random() * choices.length)];
+      document.getElementById('feed-prompt-text').textContent = feedTarget.english;
+
+      const wrap = document.getElementById('feed-options');
+      wrap.innerHTML = '';
+      choices.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = 'p-4 rounded-2xl bg-white border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 shadow-sm transition flex items-center justify-center gap-2 active:scale-95';
+        btn.innerHTML = `<span class="text-xl">🎋</span><span class="text-xl font-black font-zh text-slate-800">${item.word}</span>`;
+        btn.addEventListener('click', () => {
+          const panda = document.getElementById('panda-mascot');
+          panda.classList.remove('animate-chew', 'animate-shake');
+          void panda.offsetWidth;
+
+          if (item.id === feedTarget.id) {
+            panda.classList.add('animate-chew');
+            playSFX('correct');
+            speakText(item.word);
+            feedProgress = Math.min(FEED_GOAL, feedProgress + 1);
+            addGlobalScore(15);
+            document.getElementById('feed-progress-text').textContent = `${feedProgress} / ${FEED_GOAL}`;
+            document.getElementById('feed-progress-bar').style.width = `${(feedProgress / FEED_GOAL) * 100}%`;
+            document.getElementById('feed-feedback').innerHTML = '<span class="text-emerald-700">🐼 啊呜！真好吃！谢谢你！</span>';
+
+            if (feedProgress >= FEED_GOAL) {
+              playSFX('win');
+              if (typeof confetti === 'function') confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
+              setTimeout(() => {
+                feedProgress = 0;
+                document.getElementById('feed-progress-text').textContent = `0 / ${FEED_GOAL}`;
+                document.getElementById('feed-progress-bar').style.width = '0%';
+                nextFeedingRound();
+              }, 1800);
+            } else {
+              setTimeout(nextFeedingRound, 1000);
+            }
+          } else {
+            panda.classList.add('animate-shake');
+            playSFX('wrong');
+            document.getElementById('feed-feedback').innerHTML = '<span class="text-rose-500">🐼 乐乐摇摇头：不是这个竹子哦~</span>';
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    }
+
+    document.getElementById('feed-speak-btn').addEventListener('click', () => {
+      if (feedTarget) speakText(feedTarget.word);
+    });
+
+    // --- Game E: Whack-a-Mole Challenge ---
+    let moleTimer = 45;
+    let moleScore = 0;
+    let moleRunning = false;
+    let moleInterval = null;
+    let moleSpawnTimer = null;
+    let currentMoleChallenge = null;
+
+    function buildMoleGrid() {
+      const grid = document.getElementById('mole-grid');
+      grid.innerHTML = '';
+      for (let i = 0; i < 6; i++) {
+        const hole = document.createElement('div');
+        hole.className = 'mole-hole h-28 sm:h-32 rounded-3xl bg-amber-900/15 border-b-8 border-amber-800/30 flex items-end justify-center p-2';
+        hole.innerHTML = `
+          <button id="mole-actor-${i}" class="mole-actor w-full h-24 rounded-2xl bg-amber-200 border-2 border-amber-500 shadow-md flex flex-col items-center justify-center gap-0.5 cursor-pointer select-none">
+            <span class="text-xl">🐹</span>
+            <span class="mole-word text-lg sm:text-xl font-black font-zh text-slate-900"></span>
+          </button>
+        `;
+        hole.querySelector('button').addEventListener('click', (e) => whackMole(i, e.currentTarget));
+        grid.appendChild(hole);
+      }
+    }
+
+    function pickMoleChallenge() {
+      currentMoleChallenge = MOLE_CHALLENGES[Math.floor(Math.random() * MOLE_CHALLENGES.length)];
+      document.getElementById('mole-target-prompt').textContent = currentMoleChallenge.prompt;
+    }
+
+    function spawnMoles() {
+      if (!moleRunning) return;
+      for (let i = 0; i < 6; i++) {
+        const el = document.getElementById(`mole-actor-${i}`);
+        el.classList.remove('up', 'whacked', 'bg-emerald-200', 'bg-rose-200');
+        el.classList.add('bg-amber-200');
+        el.dataset.word = '';
+      }
+      const slots = [0, 1, 2, 3, 4, 5].sort(() => Math.random() - 0.5).slice(0, 3);
+      const words = [currentMoleChallenge.answer, ...currentMoleChallenge.distractors.slice(0, 2)].sort(() => Math.random() - 0.5);
+
+      slots.forEach((slotIdx, idx) => {
+        const el = document.getElementById(`mole-actor-${slotIdx}`);
+        el.querySelector('.mole-word').textContent = words[idx];
+        el.dataset.word = words[idx];
+        el.classList.add('up');
+      });
+    }
+
+    function whackMole(idx, btn) {
+      if (!moleRunning || !btn.classList.contains('up')) return;
+      const word = btn.dataset.word;
+      btn.classList.add('whacked');
+      if (word === currentMoleChallenge.answer) {
+        moleScore += 10;
+        addGlobalScore(10);
+        btn.classList.replace('bg-amber-200', 'bg-emerald-200');
+        playSFX('correct');
+        speakText(word);
+        pickMoleChallenge();
+        setTimeout(spawnMoles, 350);
+      } else {
+        moleScore = Math.max(0, moleScore - 2);
+        btn.classList.replace('bg-amber-200', 'bg-rose-200');
+        playSFX('wrong');
+      }
+      document.getElementById('mole-score').textContent = moleScore;
+    }
+
+    document.getElementById('mole-start-btn').addEventListener('click', () => {
+      clearInterval(moleInterval);
+      clearInterval(moleSpawnTimer);
+      moleTimer = 45;
+      moleScore = 0;
+      moleRunning = true;
+      document.getElementById('mole-timer').textContent = moleTimer;
+      document.getElementById('mole-score').textContent = '0';
+      pickMoleChallenge();
+      spawnMoles();
+
+      moleSpawnTimer = setInterval(spawnMoles, 2200);
+      moleInterval = setInterval(() => {
+        moleTimer--;
+        document.getElementById('mole-timer').textContent = moleTimer;
+        if (moleTimer <= 0) {
+          moleRunning = false;
+          clearInterval(moleInterval);
+          clearInterval(moleSpawnTimer);
+          document.querySelectorAll('.mole-actor').forEach(el => el.classList.remove('up'));
+          document.getElementById('mole-target-prompt').textContent = `挑战结束！总得分：${moleScore} 分 🎉`;
+          playSFX('win');
+          if (typeof confetti === 'function') confetti({ particleCount: 100, spread: 85, origin: { y: 0.6 } });
+        }
+      }, 1000);
+    });
+
+    // ==================== 7. INITIALIZATION ====================
+    window.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') lucide.createIcons();
+      renderDialogue();
+      renderFlashcard();
+      nextQuizQuestion();
+      initMemoryGame();
+      loadScramble();
+      nextFeedingRound();
+      buildMoleGrid();
+    });
+  </script>
+</body>
+</html>

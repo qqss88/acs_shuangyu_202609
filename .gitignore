@@ -3,3 +3,6 @@ Image_*.png
 __pycache__/
 .pytest_cache/
 kokoro-multi-lang-*/
+
+# class roster (contains parent contact info)
+clsmember.csv
